@@ -8,6 +8,7 @@ public class RoleSelectionPage extends BasePage {
     private final By studentOption = byText("Student");
     private final By professionalOption = byText("Employee");
     private final By homemakerOption = byText("Homemaker");
+    private final By employeeOption = byText("Employee");
     private final By generalOption = byText("General");
     private final By continueBtn = byText("Continue");
 
@@ -25,6 +26,10 @@ public class RoleSelectionPage extends BasePage {
 
     public void selectHomemaker() {
         click(homemakerOption);
+    }
+
+    public void selectEmployee() {
+        click(employeeOption);
     }
 
     public void selectGeneral() {

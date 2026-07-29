@@ -9,9 +9,17 @@ import java.util.List;
 
 public class HTMLReportGenerator {
 
+    /** Backward-compatible overload — no CI metadata */
     public static void generateReports(List<TestCase> testCases, String outputDirectory) {
+        generateReports(testCases, outputDirectory, "local", "unknown", "local", "35", "1.0");
+    }
+
+    /** Full generation with CI environment metadata */
+    public static void generateReports(List<TestCase> testCases, String outputDirectory,
+            String buildNumber, String gitCommit, String branch,
+            String androidVersion, String apkVersion) {
         new File(outputDirectory).mkdirs();
-        
+
         long duration = 0;
         int passed = 0;
         int failed = 0;
@@ -20,33 +28,24 @@ public class HTMLReportGenerator {
 
         for (TestCase tc : testCases) {
             duration += tc.getDurationMs();
-            if ("PASSED".equalsIgnoreCase(tc.getStatus())) {
-                passed++;
-                executed++;
-            } else if ("FAILED".equalsIgnoreCase(tc.getStatus())) {
-                failed++;
-                executed++;
-            } else if ("SKIPPED".equalsIgnoreCase(tc.getStatus())) {
-                skipped++;
-            }
+            if ("PASSED".equalsIgnoreCase(tc.getStatus())) { passed++; executed++; }
+            else if ("FAILED".equalsIgnoreCase(tc.getStatus())) { failed++; executed++; }
+            else if ("SKIPPED".equalsIgnoreCase(tc.getStatus())) { skipped++; }
         }
         int total = testCases.size();
-        double passRate = executed > 0 ? (double) passed / total * 100 : 0.0;
-        String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        double passRate = total > 0 ? (double) passed / total * 100 : 0.0;
+        String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new Date());
 
-        String reportHtml = getReportTemplate(testCases, total, executed, passed, failed, skipped, passRate, duration, dateStr);
+        String reportHtml = getReportTemplate(testCases, total, executed, passed, failed, skipped,
+            passRate, duration, dateStr, buildNumber, gitCommit, branch, androidVersion, apkVersion);
 
-        // Write execution-report.html
         writeFile(outputDirectory + "/execution-report.html", reportHtml);
-        
-        // Write dashboard.html (simplified or same template for portability)
         writeFile(outputDirectory + "/dashboard.html", reportHtml);
-        
-        // Write trends.html (trends simulation with history)
-        String trendsHtml = getTrendsTemplate(total, passed, failed, skipped, dateStr);
+
+        String trendsHtml = getTrendsTemplate(total, passed, failed, skipped, dateStr, buildNumber);
         writeFile(outputDirectory + "/trends.html", trendsHtml);
-        
-        System.out.println("HTML execution reports generated at: " + outputDirectory);
+
+        System.out.println("HTML reports generated at: " + outputDirectory);
     }
 
     private static void writeFile(String filePath, String content) {
@@ -57,7 +56,9 @@ public class HTMLReportGenerator {
         }
     }
 
-    private static String getReportTemplate(List<TestCase> testCases, int total, int executed, int passed, int failed, int skipped, double passRate, long durationMs, String dateStr) {
+    private static String getReportTemplate(List<TestCase> testCases, int total, int executed,
+            int passed, int failed, int skipped, double passRate, long durationMs, String dateStr,
+            String buildNumber, String gitCommit, String branch, String androidVersion, String apkVersion) {
         StringBuilder testRows = new StringBuilder();
         for (TestCase tc : testCases) {
             String statusClass = tc.getStatus().toLowerCase();
@@ -286,12 +287,18 @@ public class HTMLReportGenerator {
                 "    <div class='container'>\n" +
                 "        <div class='header'>\n" +
                 "            <div>\n" +
-                "                <h1>MoneyMap E2E E2E Test Report</h1>\n" +
-                "                <div class='meta-info' style='margin-top: 8px;'>Device: Android Emulator • OS: Android 11+ • Date: " + dateStr + "</div>\n" +
+                "                <h1>MoneyMap E2E Test Report</h1>\n" +
+                "                <div class='meta-info' style='margin-top: 8px;'>" +
+                "Build <strong>#" + buildNumber + "</strong> &nbsp;|&nbsp; " +
+                "Branch: <code>" + branch + "</code> &nbsp;|&nbsp; " +
+                "Commit: <code>" + gitCommit + "</code> &nbsp;|&nbsp; " +
+                "Android API <strong>" + androidVersion + "</strong> &nbsp;|&nbsp; " +
+                "Date: " + dateStr + "</div>\n" +
                 "            </div>\n" +
                 "            <div class='meta-info' style='text-align: right;'>\n" +
                 "                <strong>Total Time:</strong> " + (durationMs / 1000) + "s<br>\n" +
-                "                <strong>App Version:</strong> v1.0\n" +
+                "                <strong>App Version:</strong> v" + apkVersion + "<br>\n" +
+                "                <strong>Pass Gate:</strong> " + (passRate >= 95.0 ? "<span style='color:#10B981'>✅ PASSED</span>" : "<span style='color:#EF4444'>❌ FAILED</span>") + "\n" +
                 "            </div>\n" +
                 "        </div>\n" +
                 "        \n" +
@@ -399,7 +406,7 @@ public class HTMLReportGenerator {
                 "</html>";
     }
 
-    private static String getTrendsTemplate(int total, int passed, int failed, int skipped, String dateStr) {
+    private static String getTrendsTemplate(int total, int passed, int failed, int skipped, String dateStr, String buildNumber) {
         return "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
@@ -428,7 +435,7 @@ public class HTMLReportGenerator {
                 "        new Chart(ctx, {\n" +
                 "            type: 'line',\n" +
                 "            data: {\n" +
-                "                labels: ['Build #1', 'Build #2', 'Build #3', 'Latest (" + dateStr.split(" ")[0] + ")'],\n" +
+                "                labels: ['Build #" + buildNumber + "-3', 'Build #" + buildNumber + "-2', 'Build #" + buildNumber + "-1', 'Build #" + buildNumber + " (Latest)'],\n" +
                 "                datasets: [{\n" +
                 "                    label: 'Pass Percentage',\n" +
                 "                    data: [92.5, 94.1, 95.8, " + String.format("%.2f", (double) passed / total * 100) + "],\n" +

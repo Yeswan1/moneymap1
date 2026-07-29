@@ -7,6 +7,7 @@ public class NotificationPermissionPage extends BasePage {
 
     private final By allowButton = byText("Allow");
     private final By notNowButton = byText("Not Now");
+    private final By denyButton = By.xpath("//*[@text=\"Don't allow\" or @text='Deny' or @text='Not Now']");
 
     public NotificationPermissionPage(AndroidDriver driver) {
         super(driver);
@@ -17,6 +18,17 @@ public class NotificationPermissionPage extends BasePage {
     }
 
     public void clickNotNow() {
-        click(notNowButton);
+        if (isElementDisplayed(notNowButton)) {
+            click(notNowButton);
+        } else {
+            clickDeny();
+        }
+    }
+
+    /** Denies the notification permission request */
+    public void clickDeny() {
+        if (isElementDisplayed(denyButton)) {
+            click(denyButton);
+        }
     }
 }

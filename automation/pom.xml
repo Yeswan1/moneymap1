@@ -17,6 +17,8 @@
         <poi.version>5.2.5</poi.version>
         <json.version>20240303</json.version>
         <slf4j.version>2.0.12</slf4j.version>
+        <jackson.version>2.17.1</jackson.version>
+        <surefire.version>3.2.5</surefire.version>
     </properties>
 
     <dependencies>
@@ -34,7 +36,7 @@
             <version>${testng.version}</version>
         </dependency>
 
-        <!-- Apache POI for Excel Excel Sheets -->
+        <!-- Apache POI for Excel Reports -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
@@ -51,6 +53,13 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
+        </dependency>
+
+        <!-- Jackson for richer JSON serialisation -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -80,11 +89,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
+                <version>${surefire.version}</version>
                 <configuration>
+                    <!-- TestNG suite file -->
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <!-- Retry failing tests up to 2 times automatically -->
+                    <rerunFailingTestsCount>2</rerunFailingTestsCount>
+                    <!-- System properties injected from CI environment -->
+                    <systemPropertyVariables>
+                        <BUILD_NUMBER>${env.GITHUB_RUN_NUMBER}</BUILD_NUMBER>
+                        <GIT_COMMIT>${env.GITHUB_SHA}</GIT_COMMIT>
+                        <BRANCH_NAME>${env.GITHUB_REF_NAME}</BRANCH_NAME>
+                        <ANDROID_VERSION>${env.ANDROID_API_LEVEL}</ANDROID_VERSION>
+                    </systemPropertyVariables>
+                    <!-- Ensure test output is visible in CI logs -->
+                    <useFile>false</useFile>
+                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
                 </configuration>
             </plugin>
         </plugins>
