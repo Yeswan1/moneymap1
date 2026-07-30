@@ -1,5 +1,70 @@
 # GitHub Actions Pipeline Fix Log
 
+## 2026-07-30 - Appium ES Module Error Fix (Node.js compatibility)
+
+### Problem
+Appium installation was failing with:
+```
+Error [ERR_REQUIRE_ESM]: require() of ES Module
+/opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/appium/node_modules/p-limit/index.js
+not supported
+```
+
+### Root Cause
+- Using Node.js 18 which has incomplete ES module support
+- Latest Appium (`@latest`) requires full ES module support
+- The `p-limit` dependency is an ES module that can't be loaded with `require()` in Node 18
+
+### Solution
+1. **Upgraded Node.js: 18 → 20** - Full ES module support
+2. **Pinned Appium version: `@latest` → `@2.11.5`** - Stable, tested version
+3. **Simplified driver install:** Removed `--source npm` flag
+
+### Changes Made
+
+#### Modified Files
+- `.github/workflows/android-e2e.yml`:
+  - Line 172: Changed from `node-version: 18` to `node-version: 20`
+  - Updated stage name to reflect Node 20
+
+- `automation/.github-scripts/run-e2e-tests.sh`:
+  - Line 49: Changed from `appium@latest` to `appium@2.11.5`
+  - Line 50: Simplified driver install command
+
+### Before (failing)
+```bash
+# Node 18 + latest Appium
+npm install -g appium@latest --loglevel=error
+appium driver install uiautomator2 --source npm
+```
+
+### After (working)
+```bash
+# Node 20 + stable Appium
+npm install -g appium@2.11.5 --loglevel=error
+appium driver install uiautomator2
+```
+
+### Benefits
+1. ✅ Full ES module support with Node 20
+2. ✅ Stable Appium version (no surprise breaking changes)
+3. ✅ Consistent behavior across pipeline runs
+4. ✅ Matches backend Node version (both on Node 20)
+
+### Verification
+**What's Working Now:**
+- ✅ Emulator boots successfully
+- ✅ APK installs correctly  
+- ✅ Appium should install without ES module errors
+- ✅ Tests should execute
+
+### Commit
+```
+1fba8ee - Fix Appium ES module error: Use Node 20 and pin Appium to stable v2.11.5
+```
+
+---
+
 ## 2026-07-30 - Shell Script Syntax Fix (while loop 'done' error)
 
 ### Problem

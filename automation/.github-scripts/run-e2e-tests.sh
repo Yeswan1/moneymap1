@@ -42,11 +42,25 @@ adb install -r "$APK_PATH"
 adb shell pm list packages | grep moneymap || true
 echo "APK installed"
 
-# Install Appium
-echo "Installing Appium..."
-npm install -g appium@2.11.5 --loglevel=error
-appium driver install uiautomator2
-echo "Appium installed"
+# Install Appium 3 (requires Node >= 20.19.0 and npm >= 10)
+echo "Installing Appium 3..."
+node --version
+npm --version
+
+# Appium 3 requires npm >= 10 — upgrade in-place
+npm install -g npm@10.9.2 --loglevel=error
+echo "npm upgraded: $(npm --version)"
+
+# Pin Appium server to 3.0.0 (stable Appium 3 release)
+npm install -g appium@3.0.0 --loglevel=error
+echo "Appium version: $(appium --version)"
+
+# Install uiautomator2 v5.x (requires Appium 3)
+# Using 'appium driver install' which pulls from npm registry
+appium driver install uiautomator2@5.0.0
+echo "Installed drivers:"
+appium driver list --installed
+echo "Appium and uiautomator2 installed"
 
 # Start Appium server
 echo "Starting Appium server..."

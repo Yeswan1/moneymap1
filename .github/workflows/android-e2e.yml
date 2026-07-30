@@ -169,10 +169,10 @@ jobs:
           echo "APK_SIZE=$(du -sh ${{ env.APK_PATH }} | cut -f1)" >> $GITHUB_ENV
           echo "APK verified"
 
-      - name: "Stage 11 Setup Node.js 20 for Appium"
+      - name: "Stage 11 Setup Node.js 20.19 for Appium 3"
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20.19"
 
       - name: "Stages 12-18 Emulator Appium 510 Tests Reports"
         uses: reactivecircus/android-emulator-runner@v2
