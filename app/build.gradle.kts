@@ -13,10 +13,8 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        val baseUrl = System.getenv("MONEYMAP_API_BASE_URL")
-            ?: (project.findProperty("MONEYMAP_API_BASE_URL") as String?)
-            ?: "http://10.0.2.2:3000/api/v1/"
-        buildConfigField("String", "MONEYMAP_API_BASE_URL", "\"$baseUrl\"")
+        versionName = "1.0"
+        buildConfigField("String", "MONEYMAP_API_BASE_URL", "\"http://10.185.159.44:3000/api/v1/\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"794079844588-lbk0rg3rrdk1r8i3dpmg8ou314vpp8vd.apps.googleusercontent.com\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

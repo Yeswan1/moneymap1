@@ -1,96 +1,81 @@
 package com.example.moneymap.automation.utils;
 
 import io.appium.java_client.android.AndroidDriver;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Screenshot utility for capturing failure evidence during Appium test execution.
- * All paths are relative to the working directory for CI compatibility.
+ * ScreenshotUtil - Captures screenshots and saves them to the reports directory.
  */
 public class ScreenshotUtil {
 
-    // Relative path — works from both automation/ (local) and root (CI)
-    private static final String SCREENSHOT_BASE_DIR = "reports/screenshots";
-
-    /**
-     * Captures a PNG screenshot of the current device screen.
-     *
-     * @param driver The active AndroidDriver session
-     * @param testId The test case ID used for the filename
-     * @return Relative path to the saved screenshot, or empty string on failure
-     */
-    public static String captureScreenshot(AndroidDriver driver, String testId) {
-        if (driver == null) {
-            LogUtil.log("Screenshot skipped — driver is null for: " + testId);
-            return "";
-        }
-        try {
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(new Date());
-            // Sanitise testId to be a valid filename component
-            String safeTestId = testId.replaceAll("[^a-zA-Z0-9_\\-]", "_");
-            String fileName = safeTestId + "_" + timestamp + ".png";
-
-            // Resolve output directory relative to execution context
-            String baseDir = resolveScreenshotDir();
-            File destDir = new File(baseDir);
-            destDir.mkdirs();
-
-            File destFile = new File(destDir, fileName);
-            File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-            String relativePath = baseDir + "/" + fileName;
-            LogUtil.log("Screenshot captured: " + relativePath);
-            return relativePath;
-        } catch (Exception e) {
-            LogUtil.logError("Failed to capture screenshot for " + testId + ": " + e.getMessage(), e);
-            return "";
-        }
-    }
-
-    /**
-     * Captures a full-device screenshot using ADB (bypasses app FLAG_SECURE restrictions).
-     *
-     * @param testId The test case ID for naming
-     * @return Relative path to the saved screenshot, or empty string on failure
-     */
-    public static String captureAdbScreenshot(String testId) {
-        try {
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(new Date());
-            String safeTestId = testId.replaceAll("[^a-zA-Z0-9_\\-]", "_");
-            String localPath = resolveScreenshotDir() + "/" + safeTestId + "_adb_" + timestamp + ".png";
-
-            new File(resolveScreenshotDir()).mkdirs();
-
-            ProcessBuilder pb = new ProcessBuilder(
-                "adb", "exec-out", "screencap", "-p"
-            );
-            pb.redirectOutput(new File(localPath));
-            Process process = pb.start();
-            process.waitFor();
-
-            LogUtil.log("ADB screenshot saved: " + localPath);
-            return localPath;
-        } catch (Exception e) {
-            LogUtil.logError("ADB screenshot failed for " + testId + ": " + e.getMessage(), e);
-            return "";
-        }
-    }
-
-    private static String resolveScreenshotDir() {
-        // When running from root (CI): use automation/reports/screenshots
+    private static String getScreenshotDir() {
+        // Prefer absolute test-results directories
         if (new File("automation").exists()) {
-            return "automation/" + SCREENSHOT_BASE_DIR;
+            return "automation/reports/screenshots/";
         }
-        // When running from automation/ (local mvn): use reports/screenshots
-        return SCREENSHOT_BASE_DIR;
+        return "reports/screenshots/";
+    }
+
+    /**
+     * Capture a screenshot and save to the reports/screenshots directory.
+     * @param driver the AndroidDriver instance
+     * @param testCaseId used to name the file
+     * @return relative path to the screenshot (from the reports root)
+     */
+    public static String captureScreenshot(AndroidDriver driver, String testCaseId) {
+        if (driver == null) return "";
+        try {
+            String screenshotDir = getScreenshotDir();
+            File dir = new File(screenshotDir);
+            if (!dir.exists()) dir.mkdirs();
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String fileName = testCaseId + "_" + timestamp + ".png";
+            File destFile = new File(dir, fileName);
+
+            File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            FileUtils.copyFile(srcFile, destFile);
+            LogUtil.log("Screenshot saved: " + destFile.getAbsolutePath());
+            return "screenshots/" + fileName;  // relative from reports/
+        } catch (Exception e) {
+            LogUtil.logError("Screenshot capture failed for " + testCaseId, e);
+            return "";
+        }
+    }
+
+    /**
+     * Capture screenshot as Base64 (for embedding in HTML reports).
+     */
+    public static String captureBase64(AndroidDriver driver) {
+        if (driver == null) return "";
+        try {
+            return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BASE64);
+        } catch (Exception e) {
+            LogUtil.logError("Base64 screenshot capture failed", e);
+            return "";
+        }
+    }
+
+    /**
+     * Delete all screenshots older than a given number of days.
+     */
+    public static void cleanOldScreenshots(int daysOld) {
+        File dir = new File(getScreenshotDir());
+        if (!dir.exists()) return;
+        long threshold = System.currentTimeMillis() - (long) daysOld * 24 * 60 * 60 * 1000;
+        File[] files = dir.listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (f.lastModified() < threshold) {
+                f.delete();
+            }
+        }
     }
 }

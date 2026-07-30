@@ -5,121 +5,123 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
 
 /**
- * Thread-safe Appium AndroidDriver factory using ThreadLocal storage.
- * Each thread (parallel test worker) gets its own independent driver instance.
+ * AppiumDriverFactory - Thread-safe singleton factory for AndroidDriver.
+ * Loads configuration from appium-config.json and handles path resolution.
  */
 public class AppiumDriverFactory {
 
-    // ThreadLocal ensures each parallel thread has its own driver instance
-    private static final ThreadLocal<AndroidDriver> driverThreadLocal = new ThreadLocal<>();
+    private static AndroidDriver driver;
+    private static final String DEFAULT_APPIUM_URL = "http://127.0.0.1:4723";
 
-    /**
-     * Returns the AndroidDriver for the current thread. Creates one if it doesn't exist.
-     */
-    public static AndroidDriver getDriver() {
-        if (driverThreadLocal.get() == null) {
+    public static synchronized AndroidDriver getDriver() {
+        if (driver == null) {
             try {
-                // Resolve config path — supports both local and CI execution contexts
-                String configPath = resolveConfigPath();
-                JSONObject config = new JSONObject(new JSONTokener(new FileReader(configPath)));
-
-                UiAutomator2Options options = new UiAutomator2Options();
-                options.setPlatformName(config.optString("platformName", "Android"));
-                options.setAutomationName(config.optString("automationName", "UiAutomator2"));
-                options.setDeviceName(config.optString("deviceName", "Android Emulator"));
-
-                // Resolve APK path with multiple fallback strategies
-                options.setApp(resolveApkPath(config.optString("app")));
-
-                options.setAppPackage(config.optString("appPackage", "com.example.moneymap"));
-                options.setAppActivity(config.optString("appActivity", "com.example.moneymap.MainActivity"));
-                options.setCapability("appWaitActivity", config.optString("appWaitActivity", "com.example.moneymap.*"));
-                options.setCapability("appWaitDuration", config.optInt("appWaitDuration", 30000));
-                options.setNoReset(config.optBoolean("noReset", false));
-                options.setFullReset(config.optBoolean("fullReset", false));
-                options.setCapability("autoGrantPermissions", config.optBoolean("autoGrantPermissions", true));
-                options.setCapability("newCommandTimeout", config.optInt("newCommandTimeout", 300));
-                options.setCapability("systemPort", config.optInt("systemPort", 8200));
-                options.setAdbExecTimeout(Duration.ofMillis(config.optInt("adbExecTimeout", 120000)));
-                options.setCapability("uiautomator2ServerLaunchTimeout", config.optInt("uiautomator2ServerLaunchTimeout", 60000));
-                options.setCapability("uiautomator2ServerInstallTimeout", config.optInt("uiautomator2ServerInstallTimeout", 60000));
-
-                URL serverUrl = new URI("http://127.0.0.1:4723").toURL();
-                AndroidDriver driver = new AndroidDriver(serverUrl, options);
+                JSONObject config = loadConfig();
+                UiAutomator2Options options = buildOptions(config);
+                String appiumUrl = config.optString("appiumUrl", DEFAULT_APPIUM_URL);
+                URL serverUrl = new URI(appiumUrl).toURL();
+                driver = new AndroidDriver(serverUrl, options);
                 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-                driverThreadLocal.set(driver);
-
-                LogUtil.log("AndroidDriver session created for thread: " + Thread.currentThread().getName());
+                LogUtil.log("Appium Driver initialized successfully. Session: " + driver.getSessionId());
             } catch (Exception e) {
-                LogUtil.logError("Failed to initialize AndroidDriver: " + e.getMessage(), e);
-                throw new RuntimeException("AndroidDriver init failed: " + e.getMessage(), e);
+                LogUtil.logError("Failed to initialize AndroidDriver", e);
+                throw new RuntimeException("Appium driver initialization failed: " + e.getMessage(), e);
             }
         }
-        return driverThreadLocal.get();
+        return driver;
     }
 
-    /**
-     * Quits and removes the driver for the current thread.
-     */
-    public static void quitDriver() {
-        AndroidDriver driver = driverThreadLocal.get();
+    public static synchronized void quitDriver() {
         if (driver != null) {
             try {
                 driver.quit();
-                LogUtil.log("AndroidDriver session closed for thread: " + Thread.currentThread().getName());
+                LogUtil.log("Appium Driver session closed.");
             } catch (Exception e) {
-                System.err.println("Error quitting driver: " + e.getMessage());
+                LogUtil.logError("Error quitting driver", e);
             } finally {
-                driverThreadLocal.remove();
+                driver = null;
             }
         }
     }
 
-    /**
-     * Returns true if a live driver session exists on the current thread.
-     */
-    public static boolean isDriverActive() {
-        return driverThreadLocal.get() != null;
+    public static synchronized boolean isDriverAlive() {
+        if (driver == null) return false;
+        try {
+            driver.getSessionId();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    private static String resolveConfigPath() {
-        String[] candidates = {
+    // ─── Configuration ────────────────────────────────────────────────────────
+
+    private static JSONObject loadConfig() throws Exception {
+        // Search for config file in multiple locations
+        String[] searchPaths = {
             "automation/config/appium-config.json",
             "config/appium-config.json",
             "../automation/config/appium-config.json"
         };
-        for (String path : candidates) {
-            if (new java.io.File(path).exists()) return path;
+        for (String path : searchPaths) {
+            File f = new File(path);
+            if (f.exists()) {
+                LogUtil.log("Loading Appium config from: " + f.getAbsolutePath());
+                return new JSONObject(new JSONTokener(new FileReader(f)));
+            }
         }
-        throw new RuntimeException("appium-config.json not found. Searched: " + String.join(", ", candidates));
+        LogUtil.log("Config file not found; using defaults.");
+        return new JSONObject();
+    }
+
+    private static UiAutomator2Options buildOptions(JSONObject config) {
+        UiAutomator2Options options = new UiAutomator2Options();
+        options.setPlatformName(config.optString("platformName", "Android"));
+        options.setAutomationName(config.optString("automationName", "UiAutomator2"));
+        options.setDeviceName(config.optString("deviceName", "Android Emulator"));
+        options.setAppPackage(config.optString("appPackage", "com.example.moneymap"));
+        options.setAppActivity(config.optString("appActivity", "com.example.moneymap.MainActivity"));
+        options.setNoReset(config.optBoolean("noReset", false));
+        options.setFullReset(config.optBoolean("fullReset", false));
+        options.setCapability("autoGrantPermissions", config.optBoolean("autoGrantPermissions", true));
+        options.setCapability("newCommandTimeout", config.optInt("newCommandTimeout", 300));
+        options.setCapability("systemPort", config.optInt("systemPort", 8200));
+        options.setAdbExecTimeout(Duration.ofMillis(config.optInt("adbExecTimeout", 120000)));
+
+        // Resolve APK path
+        String appPath = resolveApkPath(config.optString("app", ""));
+        if (!appPath.isEmpty()) {
+            options.setApp(appPath);
+            LogUtil.log("APK path resolved: " + appPath);
+        }
+
+        return options;
     }
 
     private static String resolveApkPath(String configuredPath) {
-        // 1. Try the configured path as-is
-        if (configuredPath != null && new java.io.File(configuredPath).exists()) {
-            return new java.io.File(configuredPath).getAbsolutePath();
+        if (!configuredPath.isEmpty() && new File(configuredPath).exists()) {
+            return configuredPath;
         }
-        // 2. Try common relative paths from automation/ and root
-        String[] fallbacks = {
+        // Try relative paths
+        String[] candidates = {
             "../app/build/outputs/apk/debug/app-debug.apk",
             "app/build/outputs/apk/debug/app-debug.apk",
             "../../app/build/outputs/apk/debug/app-debug.apk"
         };
-        for (String path : fallbacks) {
-            java.io.File f = new java.io.File(path);
+        for (String candidate : candidates) {
+            File f = new File(candidate);
             if (f.exists()) {
-                LogUtil.log("Resolved APK path: " + f.getAbsolutePath());
                 return f.getAbsolutePath();
             }
         }
-        // 3. Return configured path and let Appium report the error clearly
-        LogUtil.log("WARNING: APK not found at any expected location. Using: " + configuredPath);
-        return configuredPath;
+        LogUtil.log("WARNING: APK file not found. Appium will attempt to use installed app.");
+        return "";
     }
 }

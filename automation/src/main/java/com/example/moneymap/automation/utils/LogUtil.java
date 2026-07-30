@@ -1,160 +1,137 @@
 package com.example.moneymap.automation.utils;
 
 import io.appium.java_client.android.AndroidDriver;
+import org.openqa.selenium.logging.LogEntry;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
- * Structured logging and ADB device log capture utility.
- * All output is timestamped and written to both console and a rolling session log file.
+ * LogUtil - Provides structured execution logging and device log capture.
  */
 public class LogUtil {
 
-    private static final String LOG_BASE_DIR = "reports/logs";
-    private static final String SESSION_LOG_FILE = "session.log";
-    private static FileWriter sessionLogWriter;
-    private static final Object LOCK = new Object();
-
-    static {
-        try {
-            String logDir = resolveLogDir();
-            new File(logDir).mkdirs();
-            sessionLogWriter = new FileWriter(logDir + "/" + SESSION_LOG_FILE, true);
-        } catch (IOException e) {
-            System.err.println("Failed to initialise session log writer: " + e.getMessage());
-        }
+    private static String getLogDir() {
+        if (new File("automation").exists()) return "automation/reports/logs/";
+        return "reports/logs/";
     }
 
-    /**
-     * Logs an informational message with timestamp to console and session log.
-     */
+    // ─── Execution logging ────────────────────────────────────────────────────
+
     public static void log(String message) {
-        String entry = formatEntry("INFO", message);
-        System.out.println(entry);
-        writeToSessionLog(entry);
+        String formatted = formatLine("INFO", message);
+        System.out.println(formatted);
+        appendToFile("execution.log", formatted);
     }
 
-    /**
-     * Logs an error message with stack trace to console and session log.
-     */
+    public static void logWarning(String message) {
+        String formatted = formatLine("WARN", message);
+        System.out.println(formatted);
+        appendToFile("execution.log", formatted);
+    }
+
     public static void logError(String message, Throwable t) {
-        String entry = formatEntry("ERROR", message);
-        System.err.println(entry);
-        writeToSessionLog(entry);
+        String formatted = formatLine("ERROR", message + (t != null ? " - " + t.getMessage() : ""));
+        System.err.println(formatted);
+        appendToFile("execution.log", formatted);
         if (t != null) {
-            t.printStackTrace();
-            writeToSessionLog(stackTraceToString(t));
+            try (PrintWriter pw = new PrintWriter(new FileWriter(
+                    new File(getLogDir(), "execution.log"), true))) {
+                t.printStackTrace(pw);
+            } catch (Exception ignored) {}
         }
     }
 
+    public static void logTestStart(String testId, String testName) {
+        log(String.format("▶ START  [%s] %s", testId, testName));
+    }
+
+    public static void logTestPass(String testId, long durationMs) {
+        log(String.format("✔ PASS   [%s] Duration: %dms", testId, durationMs));
+    }
+
+    public static void logTestFail(String testId, String reason, long durationMs) {
+        log(String.format("✘ FAIL   [%s] Duration: %dms | Reason: %s", testId, durationMs, reason));
+    }
+
+    public static void logTestSkip(String testId) {
+        log(String.format("⊘ SKIP   [%s]", testId));
+    }
+
+    // ─── Device log capture ───────────────────────────────────────────────────
+
     /**
-     * Captures ADB logcat output from the connected device and writes it to a file.
-     *
-     * @param driver  The active AndroidDriver session (used to get app package)
-     * @param testId  The test case ID for naming the log file
-     * @return Relative path to the saved log file, or empty string on failure
+     * Captures logcat entries from the device and writes them to a file.
+     * @return relative path from reports root to the log file
      */
-    public static String captureDeviceLogs(AndroidDriver driver, String testId) {
-        try {
-            String logDir = resolveLogDir();
-            new File(logDir).mkdirs();
+    public static String captureDeviceLogs(AndroidDriver driver, String testCaseId) {
+        if (driver == null) return "";
+        String logDir = getLogDir();
+        File dir = new File(logDir);
+        if (!dir.exists()) dir.mkdirs();
 
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String safeTestId = testId.replaceAll("[^a-zA-Z0-9_\\-]", "_");
-            String logFilePath = logDir + "/" + safeTestId + "_" + timestamp + "_adb.log";
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = testCaseId + "_device_" + timestamp + ".log";
+        File logFile = new File(dir, fileName);
 
-            // Capture last 500 lines of logcat filtered to the app's package
-            ProcessBuilder pb = new ProcessBuilder(
-                "adb", "logcat", "-d", "-t", "500", "*:E", "moneymap:V"
-            );
-            pb.redirectErrorStream(true);
-            pb.redirectOutput(new File(logFilePath));
-            Process process = pb.start();
-            process.waitFor();
-
-            log("ADB device log captured: " + logFilePath);
-            return logFilePath;
+        try (PrintWriter writer = new PrintWriter(new FileWriter(logFile))) {
+            List<LogEntry> entries = driver.manage().logs().get("logcat").getAll();
+            writer.println("=== Device Logcat for " + testCaseId + " ===");
+            writer.println("Captured at: " + new Date());
+            writer.println("Entry count: " + entries.size());
+            writer.println("===========================================");
+            for (LogEntry entry : entries) {
+                writer.println(new Date(entry.getTimestamp()) + " | " +
+                        entry.getLevel() + " | " + entry.getMessage());
+            }
+            log("Device logs captured: " + fileName + " (" + entries.size() + " entries)");
+            return "logs/" + fileName;
         } catch (Exception e) {
-            logError("Failed to capture device logs for " + testId + ": " + e.getMessage(), e);
+            logError("Failed to capture device logs for " + testCaseId, e);
             return "";
         }
     }
 
-    /**
-     * Captures Appium server log snippet and appends to session log.
-     *
-     * @param driver  The active AndroidDriver session
-     * @param testId  Test case identifier for context
-     */
-    public static void captureAppiumLogs(AndroidDriver driver, String testId) {
-        try {
-            if (driver != null) {
-                java.util.List<String> logs = driver.manage().logs().get("server").getAll()
-                    .stream()
-                    .map(entry -> entry.getTimestamp() + " " + entry.getLevel() + ": " + entry.getMessage())
-                    .collect(java.util.stream.Collectors.toList());
+    // ─── Appium log capture ───────────────────────────────────────────────────
 
-                String logEntry = formatEntry("APPIUM", "[" + testId + "] Server log lines: " + logs.size());
-                writeToSessionLog(logEntry);
+    public static String captureAppiumLogs(AndroidDriver driver, String testCaseId) {
+        if (driver == null) return "";
+        String logDir = getLogDir();
+        File dir = new File(logDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = testCaseId + "_appium_" + timestamp + ".log";
+        File logFile = new File(dir, fileName);
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(logFile))) {
+            List<LogEntry> entries = driver.manage().logs().get("server").getAll();
+            for (LogEntry entry : entries) {
+                writer.println(new Date(entry.getTimestamp()) + " | " + entry.getMessage());
             }
+            return "logs/" + fileName;
         } catch (Exception e) {
-            // Appium log retrieval is best-effort only
-            log("Appium log capture skipped for " + testId + ": " + e.getMessage());
+            // Appium server logs may not always be available
+            return "";
         }
     }
 
-    /**
-     * Closes the session log writer. Call this at suite teardown.
-     */
-    public static void closeSessionLog() {
-        synchronized (LOCK) {
-            if (sessionLogWriter != null) {
-                try {
-                    sessionLogWriter.flush();
-                    sessionLogWriter.close();
-                } catch (IOException e) {
-                    System.err.println("Failed to close session log: " + e.getMessage());
-                }
-            }
-        }
+    // ─── Internal ─────────────────────────────────────────────────────────────
+
+    private static String formatLine(String level, String message) {
+        String ts = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
+        return String.format("[%s] [%-5s] %s", ts, level, message);
     }
 
-    // ── Internal Helpers ─────────────────────────────────────────────────────
-
-    private static String formatEntry(String level, String message) {
-        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-        String thread = Thread.currentThread().getName();
-        return String.format("[%s] [%s] [%s] %s", timestamp, level, thread, message);
-    }
-
-    private static void writeToSessionLog(String entry) {
-        synchronized (LOCK) {
-            if (sessionLogWriter != null) {
-                try {
-                    sessionLogWriter.write(entry + System.lineSeparator());
-                    sessionLogWriter.flush();
-                } catch (IOException e) {
-                    System.err.println("Failed to write to session log: " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    private static String stackTraceToString(Throwable t) {
-        java.io.StringWriter sw = new java.io.StringWriter();
-        t.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
-    }
-
-    private static String resolveLogDir() {
-        if (new File("automation").exists()) {
-            return "automation/" + LOG_BASE_DIR;
-        }
-        return LOG_BASE_DIR;
+    private static synchronized void appendToFile(String fileName, String message) {
+        File dir = new File(getLogDir());
+        if (!dir.exists()) dir.mkdirs();
+        try (PrintWriter pw = new PrintWriter(new FileWriter(new File(dir, fileName), true))) {
+            pw.println(message);
+        } catch (Exception ignored) {}
     }
 }

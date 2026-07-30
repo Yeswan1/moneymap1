@@ -3,29 +3,43 @@ package com.example.moneymap.automation.pages;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 
+/**
+ * OnboardingPage - Page Object for OnboardingScreen / OnboardingActivity.
+ */
 public class OnboardingPage extends BasePage {
 
-    private final By skipButton = byText("Skip");
-    private final By continueButton = byText("Continue");
-    private final By getStartedButton = byText("Get Started");
+    private final By skipButton = By.xpath(
+            "//*[@text='Skip' or @content-desc='Skip']");
+    private final By nextButton = By.xpath(
+            "//*[@text='Next' or @content-desc='Next' or @text='Next ->']");
+    private final By getStartedButton = By.xpath(
+            "//*[@text='Get Started' or @content-desc='Get Started']");
 
     public OnboardingPage(AndroidDriver driver) {
         super(driver);
     }
 
-    public void clickSkip() {
-        click(skipButton);
+    public void skipOnboarding() {
+        try {
+            click(skipButton);
+        } catch (Exception e) {
+            // If no skip, navigate forward
+            clickNext();
+            clickNext();
+        }
     }
 
-    public void clickContinue() {
-        click(continueButton);
+    public void clickNext() {
+        click(nextButton);
     }
 
     public void clickGetStarted() {
-        click(getStartedButton);
+        try { click(getStartedButton); }
+        catch (Exception e) { clickNext(); }
     }
 
-    public boolean isTitleDisplayed(String titleText) {
-        return isElementDisplayed(byText(titleText));
+    public boolean isOnboardingDisplayed() {
+        return isTextVisible("Track Every Penny") || isTextVisible("Smart Budgeting")
+                || isTextVisible("Pocket Manager");
     }
 }

@@ -6,25 +6,35 @@ import com.example.moneymap.automation.utils.AppiumDriverFactory;
 import com.example.moneymap.automation.utils.LogUtil;
 import com.example.moneymap.automation.utils.ScreenshotUtil;
 import io.appium.java_client.android.AndroidDriver;
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestResult;
+import org.testng.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * TestNG listener for the MoneyMap E2E automation suite.
- * Captures screenshots, ADB device logs, and stack traces on test failure.
- * Updates the test case registry with PASSED/FAILED/SKIPPED status and timing.
+ * TestNGListener - Captures pass/fail/skip status, screenshots, and logs for every test.
  */
-public class TestNGListener implements ITestListener {
+public class TestNGListener implements ITestListener, ISuiteListener {
+
+    @Override
+    public void onStart(ISuite suite) {
+        LogUtil.log("==========================================");
+        LogUtil.log("  Suite starting: " + suite.getName());
+        LogUtil.log("==========================================");
+    }
+
+    @Override
+    public void onFinish(ISuite suite) {
+        LogUtil.log("==========================================");
+        LogUtil.log("  Suite finished: " + suite.getName());
+        LogUtil.log("==========================================");
+    }
 
     @Override
     public void onTestStart(ITestResult result) {
         TestCase tc = extractTestCase(result);
         if (tc != null) {
-            LogUtil.log("▶ START [" + tc.getTestId() + "] " + tc.getName());
+            LogUtil.logTestStart(tc.getTestId(), tc.getName());
         }
     }
 
@@ -33,8 +43,9 @@ public class TestNGListener implements ITestListener {
         TestCase tc = extractTestCase(result);
         long duration = result.getEndMillis() - result.getStartMillis();
         if (tc != null) {
-            BaseTest.updateTestCase(tc.getTestId(), "PASSED", "Executed successfully.", duration, "", "");
-            LogUtil.log(String.format("✓ PASSED [%s] in %dms", tc.getTestId(), duration));
+            BaseTest.updateTestCase(tc.getTestId(), "PASSED",
+                    "Executed successfully.", duration, "", "");
+            LogUtil.logTestPass(tc.getTestId(), duration);
         }
     }
 
@@ -43,41 +54,32 @@ public class TestNGListener implements ITestListener {
         TestCase tc = extractTestCase(result);
         long duration = result.getEndMillis() - result.getStartMillis();
 
-        // Build stack trace string
+        // Build failure message
         Throwable throwable = result.getThrowable();
-        String stackTrace = "";
-        String errorMessage = "Unknown error";
-        if (throwable != null) {
-            StringWriter sw = new StringWriter();
-            throwable.printStackTrace(new PrintWriter(sw));
-            stackTrace = sw.toString();
-            errorMessage = throwable.getMessage() != null ? throwable.getMessage() : throwable.getClass().getSimpleName();
-        }
+        String errorMessage = throwable != null ? throwable.getMessage() : "Unknown failure";
+        StringWriter sw = new StringWriter();
+        if (throwable != null) throwable.printStackTrace(new PrintWriter(sw));
+        String stackTrace = sw.toString();
+        String fullReason = errorMessage + (stackTrace.isEmpty() ? "" : "\n\nStack Trace:\n" + stackTrace);
 
-        // Capture failure evidence using the thread-local driver
+        // Capture artifacts
         String screenshotPath = "";
         String deviceLogPath = "";
         try {
             AndroidDriver driver = AppiumDriverFactory.getDriver();
-            if (driver != null) {
-                String testId = tc != null ? tc.getTestId() : "UnknownTC";
+            if (driver != null && AppiumDriverFactory.isDriverAlive()) {
+                String testId = tc != null ? tc.getTestId() : "UNKNOWN";
                 screenshotPath = ScreenshotUtil.captureScreenshot(driver, testId);
                 deviceLogPath = LogUtil.captureDeviceLogs(driver, testId);
             }
         } catch (Exception e) {
-            LogUtil.log("Evidence capture failed (driver may be null): " + e.getMessage());
+            LogUtil.logError("Listener failed to capture artifacts", e);
         }
 
-        // Build enriched failure reason including device info
-        String deviceInfo = getDeviceInfo();
-        String fullFailureReason = errorMessage + "\n\n" +
-            "Device: " + deviceInfo + "\n\n" +
-            "Stack Trace:\n" + stackTrace;
-
         if (tc != null) {
-            BaseTest.updateTestCase(tc.getTestId(), "FAILED", fullFailureReason, duration,
-                screenshotPath, deviceLogPath);
-            LogUtil.log(String.format("✗ FAILED [%s] in %dms — %s", tc.getTestId(), duration, errorMessage));
+            BaseTest.updateTestCase(tc.getTestId(), "FAILED",
+                    fullReason, duration, screenshotPath, deviceLogPath);
+            LogUtil.logTestFail(tc.getTestId(), errorMessage, duration);
         }
     }
 
@@ -86,33 +88,33 @@ public class TestNGListener implements ITestListener {
         TestCase tc = extractTestCase(result);
         long duration = result.getEndMillis() - result.getStartMillis();
         if (tc != null) {
-            BaseTest.updateTestCase(tc.getTestId(), "SKIPPED", "Test skipped by TestNG runner.", duration, "", "");
-            LogUtil.log("⚠ SKIPPED [" + tc.getTestId() + "]");
+            String reason = result.getThrowable() != null
+                    ? result.getThrowable().getMessage() : "Skipped by TestNG";
+            BaseTest.updateTestCase(tc.getTestId(), "SKIPPED", reason, duration, "", "");
+            LogUtil.logTestSkip(tc.getTestId());
         }
     }
 
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-        // Not used — all failures are critical
+        onTestFailure(result);
     }
 
     @Override
     public void onStart(ITestContext context) {
-        LogUtil.log("Test context started: " + context.getName());
+        LogUtil.log("Test context starting: " + context.getName());
     }
 
     @Override
     public void onFinish(ITestContext context) {
-        LogUtil.log(String.format(
-            "Test context finished: %s — Passed: %d | Failed: %d | Skipped: %d",
-            context.getName(),
-            context.getPassedTests().size(),
-            context.getFailedTests().size(),
-            context.getSkippedTests().size()
-        ));
+        LogUtil.log(String.format("Test context finished: %s | Passed: %d | Failed: %d | Skipped: %d",
+                context.getName(),
+                context.getPassedTests().size(),
+                context.getFailedTests().size(),
+                context.getSkippedTests().size()));
     }
 
-    // ── Internal Helpers ───────────────────────────────────────────────────
+    // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private TestCase extractTestCase(ITestResult result) {
         Object[] params = result.getParameters();
@@ -120,23 +122,5 @@ public class TestNGListener implements ITestListener {
             return (TestCase) params[0];
         }
         return null;
-    }
-
-    /**
-     * Returns a human-readable device info string for failure reports.
-     * Uses the ThreadLocal driver to avoid cross-thread driver access.
-     */
-    private String getDeviceInfo() {
-        try {
-            AndroidDriver driver = AppiumDriverFactory.getDriver();
-            if (driver != null) {
-                String platformVersion = (String) driver.getCapabilities().getCapability("platformVersion");
-                String deviceName = (String) driver.getCapabilities().getCapability("deviceName");
-                return String.format("%s (Android %s)",
-                    deviceName != null ? deviceName : "Android Emulator",
-                    platformVersion != null ? platformVersion : "Unknown");
-            }
-        } catch (Exception ignored) {}
-        return "Android Emulator (info unavailable)";
     }
 }

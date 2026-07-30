@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="MoneyMap Android E2E Suite" verbose="1" parallel="false" thread-count="1">
 
-    <!-- Registered listeners -->
+<!--
+  MoneyMap Enterprise E2E Test Suite
+  510+ test cases across 20 modules
+  Pass threshold: 95%
+-->
+<suite name="MoneyMap Android E2E Enterprise Suite" verbose="1" thread-count="1">
+
     <listeners>
         <listener class-name="com.example.moneymap.automation.listeners.TestNGListener" />
     </listeners>
 
-    <!-- Main E2E test run — all 510+ test cases via DataProvider -->
-    <test name="MoneyMap Appium E2E Tests">
+    <parameter name="appiumUrl"   value="http://127.0.0.1:4723"/>
+    <parameter name="apkPath"     value="../app/build/outputs/apk/debug/app-debug.apk"/>
+    <parameter name="appPackage"  value="com.example.moneymap"/>
+    <parameter name="appActivity" value="com.example.moneymap.MainActivity"/>
+
+    <test name="MoneyMap E2E Test Execution" preserve-order="false">
+        <groups>
+            <run>
+                <include name="e2e"/>
+                <include name="regression"/>
+            </run>
+        </groups>
         <classes>
-            <class name="com.example.moneymap.automation.tests.E2EAutomationTest" />
+            <class name="com.example.moneymap.automation.tests.E2EAutomationTest"/>
         </classes>
     </test>
 

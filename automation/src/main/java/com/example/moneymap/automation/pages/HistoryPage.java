@@ -2,77 +2,71 @@ package com.example.moneymap.automation.pages;
 
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
+/**
+ * HistoryPage - Page Object for Transaction History / Wallet tab.
+ */
 public class HistoryPage extends BasePage {
 
-    private static final By SEARCH_INPUT = By.xpath(
-        "//*[@resource-id='com.example.moneymap:id/search_bar' " +
-        "or @hint='Search' or @content-desc='Search transactions' " +
-        "or @class='android.widget.SearchView'//android.widget.EditText]");
-
-    private static final By HISTORY_TITLE = By.xpath(
-        "//*[@text='History' or @text='Transactions' or @text='Transaction History' " +
-        "or @content-desc='History']");
-
-    private static final By TRANSACTION_LIST = By.xpath(
-        "//*[@resource-id='com.example.moneymap:id/transactions_list' " +
-        "or @resource-id='com.example.moneymap:id/recycler_view']");
-
-    private static final By FIRST_TRANSACTION_ITEM = By.xpath(
-        "//*[contains(@text,'Food') or contains(@text,'Transport') " +
-        "or contains(@text,'Income') or contains(@text,'Expense')]");
-
     private final By searchIcon = By.xpath(
-        "//*[contains(@content-desc,'Search') or @resource-id='com.example.moneymap:id/search_btn']");
+            "//*[contains(@content-desc,'Search') or contains(@text,'Search')]");
     private final By filterIcon = By.xpath(
-        "//*[contains(@content-desc,'Filter') or @resource-id='com.example.moneymap:id/filter_btn']");
+            "//*[contains(@content-desc,'Filter') or contains(@content-desc,'filter')]");
+    private final By categoriesLink = byText("Categories");
+    private final By subscriptionsLink = byText("Subscriptions");
+    private final By transactionItems = By.xpath(
+            "//android.widget.LinearLayout[contains(@resource-id,'transaction')]" +
+            " | //*[contains(@class,'LazyColumn')]//android.view.ViewGroup");
+    private final By backButton = By.xpath("//*[@content-desc='Back']");
 
     public HistoryPage(AndroidDriver driver) {
         super(driver);
     }
 
-    /** Returns true if the history screen title or transaction list is visible */
-    public boolean isHistoryListDisplayed() {
-        return isElementDisplayed(HISTORY_TITLE) || isElementDisplayed(TRANSACTION_LIST);
+    public boolean isHistoryScreenDisplayed() {
+        return isTextVisible("History") || isTextVisible("Wallet") || isTextVisible("Transactions");
     }
 
-    /** Searches for a transaction using the search bar */
-    public void searchTransactions(String query) {
+    public void clickSearchIcon() {
+        click(searchIcon);
+    }
+
+    public void clickFilterIcon() {
+        click(filterIcon);
+    }
+
+    public void tapTransaction(int index) {
         try {
-            // Try clicking a search icon first
-            if (isElementDisplayed(searchIcon)) {
-                click(searchIcon);
+            List<WebElement> items = findElements(transactionItems);
+            if (index < items.size()) {
+                items.get(index).click();
             }
-            // Then type into the search input
-            if (isElementDisplayed(SEARCH_INPUT)) {
-                type(SEARCH_INPUT, query);
-            }
         } catch (Exception e) {
-            // Search not available on this screen — skip gracefully
+            // Fallback: tap first visible transaction
+            click(transactionItems);
         }
     }
 
-    public void clickSearch() {
-        try {
-            click(searchIcon);
-        } catch (Exception e) {
-            click(byText("Search"));
-        }
+    public void tapTransactionByName(String name) {
+        clickByText(name);
     }
 
-    public void clickFilter() {
-        try {
-            click(filterIcon);
-        } catch (Exception e) {
-            click(byText("Filter"));
-        }
+    public int getTransactionCount() {
+        return findElements(transactionItems).size();
     }
 
-    public boolean isTransactionListEmpty() {
-        return !isElementDisplayed(FIRST_TRANSACTION_ITEM);
+    public void clickBack() {
+        try { click(backButton); } catch (Exception e) { pressBack(); }
     }
 
-    public boolean isTransactionVisible(String noteOrCategory) {
-        return isElementDisplayed(byText(noteOrCategory));
+    public void clickCategories() {
+        click(categoriesLink);
+    }
+
+    public void clickSubscriptions() {
+        click(subscriptionsLink);
     }
 }
