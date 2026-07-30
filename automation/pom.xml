@@ -14,28 +14,22 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <appium.java.client.version>9.2.2</appium.java.client.version>
+        <!-- Appium java-client 9.3.0 bundles Selenium 4.21+ which has ContextAware removed.
+             Do NOT declare a separate selenium-java dependency — let Appium manage it. -->
+        <appium.java.client.version>9.3.0</appium.java.client.version>
         <testng.version>7.10.2</testng.version>
         <poi.version>5.2.5</poi.version>
         <json.version>20240303</json.version>
         <slf4j.version>2.0.12</slf4j.version>
         <commons.io.version>2.15.1</commons.io.version>
-        <selenium.version>4.19.1</selenium.version>
     </properties>
 
     <dependencies>
-        <!-- Appium Java Client -->
+        <!-- Appium Java Client (includes Selenium as a transitive dependency) -->
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
             <version>${appium.java.client.version}</version>
-        </dependency>
-
-        <!-- Selenium WebDriver (transitive, pinned for compatibility) -->
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>${selenium.version}</version>
         </dependency>
 
         <!-- TestNG -->

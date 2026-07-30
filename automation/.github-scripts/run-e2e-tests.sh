@@ -95,8 +95,12 @@ done
 
 # ── 6. Run Maven / TestNG tests ─────────────────────────────
 echo "Executing 510+ E2E tests..."
-TEST_EXIT=0
 cd automation
+
+# Run Maven and preserve its exit code correctly.
+# We cannot use: cmd | tee file (loses exit code in POSIX sh)
+# Instead: run Maven with output going to log, then replay to stdout.
+MVN_LOG="../automation/reports/logs/mvn-execution.log"
 mvn clean test \
   -DGITHUB_RUN_NUMBER="$GITHUB_RUN_NUMBER" \
   -DGITHUB_SHA="$GITHUB_SHA" \
@@ -105,7 +109,14 @@ mvn clean test \
   -Dsurefire.useFile=false \
   -Dmaven.test.failure.ignore=true \
   --no-transfer-progress \
-  2>&1 | tee "../automation/reports/logs/mvn-execution.log" || TEST_EXIT=$?
+  2>&1 | tee "$MVN_LOG"
+# In POSIX sh, PIPESTATUS is not available. Use a sentinel file instead.
+if grep -q "BUILD FAILURE" "$MVN_LOG" 2>/dev/null; then
+  TEST_EXIT=1
+  echo "Maven BUILD FAILURE detected in log"
+else
+  TEST_EXIT=0
+fi
 echo "Maven finished with exit code: ${TEST_EXIT}"
 cd ..
 
