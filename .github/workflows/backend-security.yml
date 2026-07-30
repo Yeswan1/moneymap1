@@ -22,23 +22,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ── Step 2: Semgrep SAST ────────────────────────────────────────────────
-      - name: "Semgrep SAST Scan"
-        uses: semgrep/semgrep-action@v1
+      # ── Step 2: Semgrep SAST (CLI — no token required for public rules) ────
+      - name: "Setup Python for Semgrep"
+        uses: actions/setup-python@v5
         with:
-          config: "p/nodejs p/typescript"
-        env:
-          SEMGREP_TIMEOUT: 300
-        continue-on-error: true
+          python-version: "3.11"
 
-      - name: "Export Semgrep Results"
-        if: always()
+      - name: "Semgrep SAST Scan"
         run: |
-          if [ -f semgrep.sarif ]; then
-            cp semgrep.sarif semgrep-results.json
-          else
-            echo '{"results":[]}' > semgrep-results.json
+          pip install semgrep --quiet
+          semgrep scan \
+            --config "p/nodejs" \
+            --config "p/typescript" \
+            --json \
+            --output semgrep-results.json \
+            backend/ || true
+          if [ ! -f semgrep-results.json ]; then
+            echo '{"results":[],"errors":[]}' > semgrep-results.json
           fi
+          echo "Semgrep findings: $(python3 -c \"import json; d=json.load(open('semgrep-results.json')); print(len(d.get('results',[])))\")"
 
       # ── Step 3: Trivy Filesystem Scan ───────────────────────────────────────
       - name: "Trivy Filesystem Scan"
@@ -59,21 +61,28 @@ jobs:
             echo '{"Results":[]}' > trivy-results.json
           fi
 
-      # ── Step 4: Gitleaks Secret Detection ───────────────────────────────────
-      - name: "Gitleaks Secret Detection"
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
-      - name: "Export Gitleaks Results"
-        if: always()
+      # ── Step 4: Gitleaks Secret Detection (CLI — no license required) ────────
+      - name: "Install Gitleaks CLI"
         run: |
-          if [ -f gitleaks-report.json ]; then
-            cp gitleaks-report.json gitleaks-results.json
-          else
+          GITLEAKS_VERSION="8.18.4"
+          wget -q "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -O gitleaks.tar.gz
+          tar -xzf gitleaks.tar.gz gitleaks
+          chmod +x gitleaks
+          echo "Gitleaks $(./gitleaks version) installed"
+
+      - name: "Run Gitleaks Secret Scan"
+        run: |
+          ./gitleaks detect \
+            --source . \
+            --report-format json \
+            --report-path gitleaks-results.json \
+            --redact \
+            --no-git \
+            --exit-code 0 || true
+          if [ ! -f gitleaks-results.json ]; then
             echo '[]' > gitleaks-results.json
           fi
+          echo "Gitleaks findings: $(python3 -c \"import json; d=json.load(open('gitleaks-results.json')); print(len(d) if isinstance(d,list) else 0)\")"
 
       # ── Step 5: OWASP Dependency Check ──────────────────────────────────────
       - name: "OWASP Dependency Check"
