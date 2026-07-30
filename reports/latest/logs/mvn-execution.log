@@ -13,26 +13,107 @@
 [INFO] --- compiler:3.13.0:compile (default-compile) @ moneymap-automation ---
 [INFO] Recompiling the module because of changed source code.
 [INFO] Compiling 18 source files with javac [debug target 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ moneymap-automation ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ moneymap-automation ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 3 source files with javac [debug target 21] to target/test-classes
 [INFO] -------------------------------------------------------------
 [ERROR] COMPILATION ERROR : 
 [INFO] -------------------------------------------------------------
-[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/main/java/com/example/moneymap/automation/pages/BasePage.java:[85,19] cannot access org.openqa.selenium.ContextAware
-  class file for org.openqa.selenium.ContextAware not found
-[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/main/java/com/example/moneymap/automation/pages/BasePage.java:[93,22] cannot access org.openqa.selenium.html5.LocationContext
-  class file for org.openqa.selenium.html5.LocationContext not found
-[INFO] 2 errors 
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[132,31] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[132,53] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[132,74] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[133,35] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[133,54] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[133,72] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,22] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,46] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,61] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,77] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[135,33] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[135,56] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[135,83] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[136,30] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[136,50] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[136,75] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[137,30] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[137,52] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[137,84] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[138,33] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[41,17] cannot find symbol
+  symbol:   method runSimulated(com.example.moneymap.automation.model.TestCase,long)
+  location: class com.example.moneymap.automation.tests.E2EAutomationTest
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[154,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[155,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[156,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[216,31] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[217,31] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[275,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[276,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[277,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[314,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[314,62] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[315,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[322,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[322,61] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[329,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[329,62] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[469,52] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[488,42] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[490,24] pressBack() has protected access in com.example.moneymap.automation.pages.BasePage
+[INFO] 39 errors 
 [INFO] -------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  29.956 s
-[INFO] Finished at: 2026-07-30T08:21:15Z
+[INFO] Total time:  6.733 s
+[INFO] Finished at: 2026-07-30T08:43:04Z
 [INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project moneymap-automation: Compilation failure: Compilation failure: 
-[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/main/java/com/example/moneymap/automation/pages/BasePage.java:[85,19] cannot access org.openqa.selenium.ContextAware
-[ERROR]   class file for org.openqa.selenium.ContextAware not found
-[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/main/java/com/example/moneymap/automation/pages/BasePage.java:[93,22] cannot access org.openqa.selenium.html5.LocationContext
-[ERROR]   class file for org.openqa.selenium.html5.LocationContext not found
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project moneymap-automation: Compilation failure: Compilation failure: 
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[132,31] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[132,53] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[132,74] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[133,35] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[133,54] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[133,72] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,22] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,46] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,61] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[134,77] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[135,33] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[135,56] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[135,83] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[136,30] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[136,50] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[136,75] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[137,30] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[137,52] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[137,84] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/BaseTest.java:[138,33] incompatible types: int cannot be converted to java.lang.String
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[41,17] cannot find symbol
+[ERROR]   symbol:   method runSimulated(com.example.moneymap.automation.model.TestCase,long)
+[ERROR]   location: class com.example.moneymap.automation.tests.E2EAutomationTest
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[154,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[155,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[156,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[216,31] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[217,31] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[275,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[276,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[277,30] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[314,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[314,62] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[315,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[322,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[322,61] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[329,29] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[329,62] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[469,52] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[488,42] isTextVisible(java.lang.String) has protected access in com.example.moneymap.automation.pages.BasePage
+[ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/test/java/com/example/moneymap/automation/tests/E2EAutomationTest.java:[490,24] pressBack() has protected access in com.example.moneymap.automation.pages.BasePage
 [ERROR] -> [Help 1]
 [ERROR] 
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.

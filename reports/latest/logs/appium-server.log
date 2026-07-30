@@ -1,15 +1,15 @@
-2026-07-30 08:20:41:511 [Appium] Welcome to Appium v3.0.0
-2026-07-30 08:20:41:515 [Appium] Non-default server args:
-2026-07-30 08:20:41:517 [Appium] { loglevel: 'info', relaxedSecurityEnabled: true }
-2026-07-30 08:20:41:518 [Appium] Enabling relaxed security. All insecure features will be enabled unless explicitly disabled by --deny-insecure
-2026-07-30 08:20:41:519 [Appium] Attempting to load driver uiautomator2...
-2026-07-30 08:20:42:009 [Appium] Appium REST http interface listener started on http://0.0.0.0:4723
-2026-07-30 08:20:42:010 [Appium] You can provide the following URLs in your client code to connect to this server:
+2026-07-30 08:42:37:828 [Appium] Welcome to Appium v3.0.0
+2026-07-30 08:42:37:833 [Appium] Non-default server args:
+2026-07-30 08:42:37:835 [Appium] { loglevel: 'info', relaxedSecurityEnabled: true }
+2026-07-30 08:42:37:835 [Appium] Enabling relaxed security. All insecure features will be enabled unless explicitly disabled by --deny-insecure
+2026-07-30 08:42:37:836 [Appium] Attempting to load driver uiautomator2...
+2026-07-30 08:42:38:500 [Appium] Appium REST http interface listener started on http://0.0.0.0:4723
+2026-07-30 08:42:38:501 [Appium] You can provide the following URLs in your client code to connect to this server:
 	http://127.0.0.1:4723/ (only accessible from the same host)
-	http://10.1.0.212:4723/
+	http://10.1.0.181:4723/
 	http://172.18.0.1:4723/
-2026-07-30 08:20:42:011 [Appium] Available drivers:
-2026-07-30 08:20:42:011 [Appium]   - uiautomator2@5.0.0 (automationName 'UiAutomator2')
-2026-07-30 08:20:42:012 [Appium] No plugins have been installed. Use the "appium plugin" command to install the one(s) you want to use.
-2026-07-30 08:20:42:472 [HTTP] --> GET /status 
-2026-07-30 08:20:42:481 [HTTP] <-- GET /status 200 7 ms - 110
+2026-07-30 08:42:38:502 [Appium] Available drivers:
+2026-07-30 08:42:38:502 [Appium]   - uiautomator2@5.0.0 (automationName 'UiAutomator2')
+2026-07-30 08:42:38:503 [Appium] No plugins have been installed. Use the "appium plugin" command to install the one(s) you want to use.
+2026-07-30 08:42:38:547 [HTTP] --> GET /status 
+2026-07-30 08:42:38:558 [HTTP] <-- GET /status 200 7 ms - 110
