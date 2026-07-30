@@ -1,7 +1,15 @@
 #!/bin/sh
+# ============================================================
+# MoneyMap E2E Test Runner
+# Runs inside android-emulator-runner@v2 (POSIX sh, not bash)
+#
+# Environment variables injected by workflow:
+#   APK_PATH, APPIUM_PORT, GITHUB_RUN_NUMBER,
+#   GITHUB_SHA, GITHUB_REF_NAME, ANDROID_API_LEVEL
+# ============================================================
 set -e
 
-# Create report directories
+# ── 1. Create report directories ────────────────────────────
 mkdir -p automation/reports/screenshots
 mkdir -p automation/reports/logs
 mkdir -p "automation/Test Results/Excel"
@@ -9,91 +17,85 @@ mkdir -p "automation/Test Results/HTML"
 mkdir -p "automation/Test Results/JSON"
 mkdir -p "automation/Test Results/Summary"
 
-# Wait for emulator to boot
+# ── 2. Wait for emulator to fully boot ──────────────────────
 echo "Waiting for emulator to boot..."
 adb wait-for-device
 
 BOOT_TIMEOUT=180
 ELAPSED=0
-BOOTED=""
-
-while [ "$BOOTED" != "1" ]; do
-  BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)
+while true; do
+  BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r\n' || echo "0")
   if [ "$BOOTED" = "1" ]; then
+    echo "Emulator booted after ${ELAPSED}s"
     break
   fi
   sleep 3
   ELAPSED=$((ELAPSED + 3))
   if [ "$ELAPSED" -ge "$BOOT_TIMEOUT" ]; then
-    echo "Emulator boot timeout"
+    echo "ERROR: Emulator boot timeout after ${BOOT_TIMEOUT}s"
     exit 1
   fi
-  echo "Booting... ${ELAPSED}s"
+  echo "  booting... ${ELAPSED}s"
 done
 
-echo "Emulator booted after ${ELAPSED}s"
 adb shell input keyevent 82
 sleep 2
 adb devices
 
-# Install APK
-echo "Installing APK..."
+# ── 3. Install APK ──────────────────────────────────────────
+echo "Installing APK from: $APK_PATH"
 adb install -r "$APK_PATH"
 adb shell pm list packages | grep moneymap || true
 echo "APK installed"
 
-# Install Appium 3 (requires Node >= 20.19.0 and npm >= 10)
+# ── 4. Install Appium 3 + uiautomator2 ─────────────────────
+# Version matrix (all pinned, all compatible):
+#   npm          10.9.2   — Appium 3 requirement (npm >= 10)
+#   appium       3.0.0    — Appium 3 stable release
+#   uiautomator2 5.0.0    — requires Appium 3 (Appium 2 = v4.x)
+#   java-client  9.2.2    — W3C, compatible with Appium 3
 echo "Installing Appium 3..."
-node --version
-npm --version
-
-# Appium 3 requires npm >= 10 — upgrade in-place
+echo "  Node: $(node --version)  npm: $(npm --version)"
 npm install -g npm@10.9.2 --loglevel=error
-echo "npm upgraded: $(npm --version)"
-
-# Pin Appium server to 3.0.0 (stable Appium 3 release)
+echo "  npm upgraded to: $(npm --version)"
 npm install -g appium@3.0.0 --loglevel=error
-echo "Appium version: $(appium --version)"
-
-# Install uiautomator2 v5.x (requires Appium 3)
-# Using 'appium driver install' which pulls from npm registry
+echo "  Appium: $(appium --version)"
 appium driver install uiautomator2@5.0.0
 echo "Installed drivers:"
 appium driver list --installed
-echo "Appium and uiautomator2 installed"
+echo "Appium setup complete"
 
-# Start Appium server
-echo "Starting Appium server..."
-appium --port "$APPIUM_PORT" \
+# ── 5. Start Appium server ──────────────────────────────────
+echo "Starting Appium server on port ${APPIUM_PORT}..."
+appium server \
+  --port "$APPIUM_PORT" \
   --log automation/reports/logs/appium-server.log \
-  --log-level info --relaxed-security \
+  --log-level info \
+  --relaxed-security \
   > automation/reports/logs/appium-console.log 2>&1 &
-APPIUM_PID=$!
 
 # Wait for Appium to be ready
-echo "Waiting for Appium..."
-APPIUM_TIMEOUT=60
+APPIUM_TIMEOUT=90
 APPIUM_ELAPSED=0
-APPIUM_READY=""
-
-while [ -z "$APPIUM_READY" ]; do
+while true; do
   if curl -sf "http://127.0.0.1:${APPIUM_PORT}/status" > /dev/null 2>&1; then
-    APPIUM_READY="yes"
-    echo "Appium ready after ${APPIUM_ELAPSED}s"
+    echo "Appium server ready after ${APPIUM_ELAPSED}s"
     break
   fi
   sleep 2
   APPIUM_ELAPSED=$((APPIUM_ELAPSED + 2))
   if [ "$APPIUM_ELAPSED" -ge "$APPIUM_TIMEOUT" ]; then
-    echo "Appium failed to start"
+    echo "ERROR: Appium failed to start within ${APPIUM_TIMEOUT}s"
+    echo "--- appium-console.log ---"
     cat automation/reports/logs/appium-console.log || true
     exit 1
   fi
-  echo "Waiting for Appium... ${APPIUM_ELAPSED}s"
+  echo "  waiting for Appium... ${APPIUM_ELAPSED}s"
 done
 
-# Run Maven tests
-echo "Executing 510+ E2E Tests..."
+# ── 6. Run Maven / TestNG tests ─────────────────────────────
+echo "Executing 510+ E2E tests..."
+TEST_EXIT=0
 cd automation
 mvn clean test \
   -DGITHUB_RUN_NUMBER="$GITHUB_RUN_NUMBER" \
@@ -104,19 +106,19 @@ mvn clean test \
   -Dmaven.test.failure.ignore=true \
   --no-transfer-progress \
   2>&1 | tee "../automation/reports/logs/mvn-execution.log" || TEST_EXIT=$?
-echo "Maven exit code ${TEST_EXIT:-0}"
+echo "Maven finished with exit code: ${TEST_EXIT}"
 cd ..
 
-# Capture post-test evidence
+# ── 7. Capture post-test evidence ───────────────────────────
 echo "Capturing post-test evidence..."
 adb exec-out screencap -p > automation/reports/screenshots/post-test-device.png 2>/dev/null || true
 adb logcat -d -t 2000 > automation/reports/logs/adb-full-logcat.log 2>/dev/null || true
 cp automation/reports/logs/appium-server.log "automation/Test Results/Summary/" 2>/dev/null || true
 echo "Post-test evidence captured"
 
-# Exit with test status
-if [ -n "$TEST_EXIT" ] && [ "$TEST_EXIT" -ne 0 ]; then
-  echo "Tests failed with exit code $TEST_EXIT"
+# ── 8. Exit with Maven's status ─────────────────────────────
+if [ "$TEST_EXIT" -ne 0 ]; then
+  echo "Tests completed with failures (exit code $TEST_EXIT)"
   exit "$TEST_EXIT"
 fi
 
