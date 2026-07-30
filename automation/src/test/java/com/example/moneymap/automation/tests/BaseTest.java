@@ -191,7 +191,8 @@ public class BaseTest {
 
         try {
             LogUtil.log("Generating Excel reports...");
-            ExcelReportGenerator.generateReports(testCases, resultsDir + "/Excel");
+            ExcelReportGenerator.generateReports(testCases, resultsDir + "/Excel",
+                    buildNumber, branchName, gitCommit);
             LogUtil.log("✓ Excel reports completed");
         } catch (Exception e) {
             LogUtil.logError("❌ Excel report generation failed", e);
@@ -200,7 +201,8 @@ public class BaseTest {
 
         try {
             LogUtil.log("Generating HTML reports...");
-            HTMLReportGenerator.generateReports(testCases, resultsDir + "/HTML");
+            HTMLReportGenerator.generateReports(testCases, resultsDir + "/HTML",
+                    buildNumber, branchName, gitCommit);
             LogUtil.log("✓ HTML reports completed");
         } catch (Exception e) {
             LogUtil.logError("❌ HTML report generation failed", e);

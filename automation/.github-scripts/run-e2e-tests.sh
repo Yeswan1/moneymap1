@@ -97,6 +97,13 @@ done
 echo "Executing 510+ E2E tests..."
 cd automation
 
+# Print Maven diagnostic information for version verification
+echo "=== MAVEN DIAGNOSTICS ==="
+mvn -version
+mvn dependency:tree -Dverbose
+mvn help:effective-pom
+echo "========================="
+
 # Run Maven and preserve its exit code correctly.
 # We cannot use: cmd | tee file (loses exit code in POSIX sh)
 # Instead: run Maven with output going to log, then replay to stdout.
