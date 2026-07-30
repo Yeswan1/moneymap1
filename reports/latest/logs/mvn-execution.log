@@ -25,8 +25,8 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  20.078 s
-[INFO] Finished at: 2026-07-30T08:11:07Z
+[INFO] Total time:  29.956 s
+[INFO] Finished at: 2026-07-30T08:21:15Z
 [INFO] ------------------------------------------------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project moneymap-automation: Compilation failure: Compilation failure: 
 [ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/main/java/com/example/moneymap/automation/pages/BasePage.java:[85,19] cannot access org.openqa.selenium.ContextAware
