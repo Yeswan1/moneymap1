@@ -1,0 +1,15 @@
+[38;5;112m[Appium][0m Welcome to Appium v3.0.0
+[38;5;112m[Appium][0m Non-default server args:
+[38;5;112m[Appium][0m { loglevel: [32m'info'[39m, relaxedSecurityEnabled: [33mtrue[39m }
+[38;5;112m[Appium][0m Enabling relaxed security. All insecure features will be enabled unless explicitly disabled by --deny-insecure
+[38;5;112m[Appium][0m Attempting to load driver uiautomator2...
+[38;5;112m[Appium][0m Appium REST http interface listener started on http://0.0.0.0:4723
+[38;5;112m[Appium][0m You can provide the following URLs in your client code to connect to this server:
+	http://127.0.0.1:4723/ (only accessible from the same host)
+	http://10.1.0.143:4723/
+	http://172.18.0.1:4723/
+[38;5;112m[Appium][0m Available drivers:
+[38;5;112m[Appium][0m   - uiautomator2@5.0.0 (automationName 'UiAutomator2')
+[38;5;112m[Appium][0m No plugins have been installed. Use the "appium plugin" command to install the one(s) you want to use.
+[38;5;86m[HTTP][0m --> GET /status 
+[38;5;86m[HTTP][0m <-- GET /status 200 8 ms - 110
