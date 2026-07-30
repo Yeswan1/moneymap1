@@ -56,8 +56,8 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  20.693 s
-[INFO] Finished at: 2026-07-30T06:12:22Z
+[INFO] Total time:  24.503 s
+[INFO] Finished at: 2026-07-30T06:28:20Z
 [INFO] ------------------------------------------------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project moneymap-automation: Compilation failure: Compilation failure: 
 [ERROR] /home/runner/work/moneymap1/moneymap1/automation/src/main/java/com/example/moneymap/automation/reporting/ExcelReportGenerator.java:[4,45] package com.example.moneymap.automation.tests does not exist
