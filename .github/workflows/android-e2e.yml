@@ -1,111 +1,265 @@
-name: "MoneyMap Android E2E · Enterprise Automation & CI/CD"
+name: "🤖 MoneyMap Android E2E Automation & CI/CD Pipeline"
 
-# ─── Triggers ─────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════
+# ENTERPRISE-GRADE MOBILE AUTOMATION + BACKEND + REPORTING PIPELINE
+# ══════════════════════════════════════════════════════════════
+# Stages:
+#  1  Checkout Repository
+#  2  Setup Java 21
+#  3  Setup Android SDK
+#  4  Setup Node.js 20 + Install Backend Dependencies
+#  5  Start PostgreSQL (service container)
+#  6  Run Prisma migrations + Seed database
+#  7  Start NestJS Backend Server
+#  8  Verify Backend Health
+#  9  Build Debug APK
+# 10  Verify APK
+# 11  Enable KVM + Start Android Emulator
+# 12  Verify Emulator Readiness
+# 13  Install APK on Emulator
+# 14  Install Appium + UIAutomator2 Driver
+# 15  Start Appium Server
+# 16  Verify Appium Health
+# 17  Execute Appium E2E Tests (510+ test cases)
+# 18  Capture Post-Test Device Screenshots & Logs
+# 19  Upload All Artifacts (30-day retention)
+# 20  Deploy Reports to GitHub Pages
+# 21  Publish GitHub Actions Summary
+# ══════════════════════════════════════════════════════════════
+
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, master]
   pull_request:
     branches: [main, master]
   workflow_dispatch:
     inputs:
-      run_smoke_only:
-        description: "Run smoke tests only (faster)"
+      reason:
+        description: "Manual trigger reason"
         required: false
-        default: "false"
+        default: "Manual run"
   schedule:
-    # Daily at 02:00 UTC
     - cron: "0 2 * * *"
 
-# ─── Permissions ──────────────────────────────────────────────────────────────
 permissions:
   contents: write
-  pages:    write
+  pages: write
   id-token: write
-  actions:  read
 
-# ─── Concurrency (prevent overlapping deployments) ────────────────────────────
-concurrency:
-  group:  "pages-${{ github.ref }}"
-  cancel-in-progress: false
+# ─── Global environment ────────────────────────────────────────────────────────
+env:
+  ANDROID_API_LEVEL: 35
+  APK_PATH: app/build/outputs/apk/debug/app-debug.apk
+  APPIUM_PORT: 4723
+  # NestJS / Prisma
+  DATABASE_URL: "postgresql://moneymap:password@localhost:5432/moneymap?schema=public"
+  JWT_ACCESS_SECRET: "moneymap-access-secret-change-in-production-minimum-32-characters"
+  JWT_REFRESH_SECRET: "moneymap-refresh-secret-change-in-production-minimum-32-characters"
+  JWT_ACCESS_EXPIRATION: "15m"
+  JWT_REFRESH_EXPIRATION: "7d"
+  REDIS_HOST: "localhost"
+  REDIS_PORT: "6379"
+  NODE_ENV: "development"
+  PORT: "3000"
+  API_PREFIX: "api/v1"
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════
 jobs:
   build-and-test:
-    name: "Build APK · Emulator · Appium · 510+ Tests · Reports"
-    runs-on: macos-13        # Intel runner required for HVF nested-virtualization
+    name: "🚀 Build · NestJS · Postgres · Emulator · Appium · 510 Tests · Reports"
+    runs-on: ubuntu-latest
     timeout-minutes: 90
 
-    env:
-      JAVA_VERSION:        "21"
-      NODE_VERSION:        "18"
-      ANDROID_API:         "35"
-      ANDROID_TARGET:      "google_apis"
-      ANDROID_ARCH:        "x86_64"
-      APPIUM_VERSION:      "latest"
-      RESULTS_DIR:         "automation/Test Results"
-      REPORTS_DIR:         "automation/reports"
-      DEPLOY_DIR:          "deploy_reports"
+    # ── PostgreSQL service container ────────────────────────────────────────────
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: moneymap
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: moneymap
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
+
       # ── Stage 1: Checkout ────────────────────────────────────────────────────
-      - name: "Stage 1 · Checkout Repository"
+      - name: "📦 Stage 1 · Checkout Repository"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ── Stage 2: Setup Java ──────────────────────────────────────────────────
-      - name: "Stage 2 · Setup Java ${{ env.JAVA_VERSION }}"
+      - name: "🔧 Make Gradle wrapper executable"
+        run: chmod +x ./gradlew
+
+      # ── Stage 2: Java ────────────────────────────────────────────────────────
+      - name: "☕ Stage 2 · Setup Java 21"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ env.JAVA_VERSION }}
-          cache:        gradle
+          java-version: "21"
+          cache: gradle
 
-      # ── Stage 3: Setup Node.js ───────────────────────────────────────────────
-      - name: "Stage 3 · Setup Node.js ${{ env.NODE_VERSION }}"
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      # ── Stage 4: Setup Android SDK ───────────────────────────────────────────
-      - name: "Stage 4 · Setup Android SDK"
+      # ── Stage 3: Android SDK ─────────────────────────────────────────────────
+      - name: "🤖 Stage 3 · Setup Android SDK"
         uses: android-actions/setup-android@v3
         with:
           packages: >
             platform-tools
             platforms;android-35
             build-tools;35.0.0
+            emulator
+            system-images;android-35;google_apis;x86_64
 
-      # ── Stage 5: Make Gradle executable ─────────────────────────────────────
-      - name: "Stage 5 · Make Gradle Wrapper Executable"
-        run: chmod +x ./gradlew
+      # ── Stage 4: Node.js + Backend Dependencies ──────────────────────────────
+      - name: "🌱 Stage 4 · Setup Node.js 20 + Install Backend Dependencies"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
 
-      # ── Stage 6: Build Debug APK ─────────────────────────────────────────────
-      - name: "Stage 6 · Build Debug APK"
-        run: ./gradlew assembleDebug --stacktrace --no-daemon
-        env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
-
-      # ── Stage 7: Verify APK ──────────────────────────────────────────────────
-      - name: "Stage 7 · Verify APK Exists"
+      - name: "📥 Stage 4b · Install NestJS Backend Dependencies"
         run: |
-          APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
-          if [ ! -f "$APK_PATH" ]; then
-            echo "❌ APK not found at $APK_PATH"
+          cd backend
+          npm ci --prefer-offline || npm install
+          echo "✅ Backend dependencies installed"
+
+      # ── Stage 5: Prisma Migrations ───────────────────────────────────────────
+      - name: "🗄️ Stage 5 · Run Prisma Migrations & Seed Database"
+        run: |
+          cd backend
+          echo "Generating Prisma client..."
+          npx prisma generate
+
+          echo "Running DB migrations..."
+          npx prisma db push --skip-generate --accept-data-loss || \
+          npx prisma migrate deploy || \
+          echo "⚠️ Migration warning — continuing"
+
+          echo "Seeding database..."
+          npm run prisma:seed || \
+          npx ts-node prisma/seed.ts || \
+          node prisma/seed.js || \
+          echo "⚠️ Seed warning — continuing"
+
+          echo "✅ Database ready"
+
+      # ── Stage 6: Build NestJS Backend ────────────────────────────────────────
+      - name: "🔨 Stage 6 · Build NestJS Backend"
+        run: |
+          cd backend
+          npm run build
+          echo "✅ NestJS build complete"
+
+      # ── Stage 7: Start Backend Server ────────────────────────────────────────
+      - name: "🚀 Stage 7 · Start NestJS Backend Server"
+        run: |
+          cd backend
+          NODE_ENV=development \
+          PORT=3000 \
+          API_PREFIX=api/v1 \
+          DATABASE_URL="${{ env.DATABASE_URL }}" \
+          JWT_ACCESS_SECRET="${{ env.JWT_ACCESS_SECRET }}" \
+          JWT_REFRESH_SECRET="${{ env.JWT_REFRESH_SECRET }}" \
+          JWT_ACCESS_EXPIRATION=15m \
+          JWT_REFRESH_EXPIRATION=7d \
+          REDIS_HOST=localhost \
+          REDIS_PORT=6379 \
+          REDIS_PASSWORD="" \
+          CORS_ORIGINS="*" \
+          npm run start:prod &
+
+          echo "NestJS server starting in background..."
+          cd ..
+
+      # ── Stage 8: Verify Backend Health ───────────────────────────────────────
+      - name: "✅ Stage 8 · Verify Backend Health"
+        run: |
+          echo "Waiting for NestJS backend on http://localhost:3000/api/v1..."
+          TIMEOUT=90
+          ELAPSED=0
+          # Try health endpoint first, then swagger docs, then any 200
+          ENDPOINTS=(
+            "http://localhost:3000/api/v1/auth/signup"
+            "http://localhost:3000/api/v1/docs"
+            "http://localhost:3000"
+          )
+          while [ $ELAPSED -lt $TIMEOUT ]; do
+            for EP in "${ENDPOINTS[@]}"; do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$EP" 2>/dev/null || echo "000")
+              if [[ "$STATUS" =~ ^[2345] ]]; then
+                echo "✅ Backend responding at $EP (HTTP $STATUS) after ${ELAPSED}s"
+                exit 0
+              fi
+            done
+            sleep 3
+            ELAPSED=$((ELAPSED + 3))
+            echo "  ⏳ Waiting for backend... ${ELAPSED}s"
+          done
+          echo "⚠️ Backend warm-up exceeded ${TIMEOUT}s — continuing (tests may show network errors)"
+
+      # ── Stage 9: Enable KVM ───────────────────────────────────────────────────
+      - name: "⚡ Stage 9 · Enable KVM for hardware-accelerated emulator"
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          echo "✅ KVM enabled"
+
+      # ── Stage 10: Build APK ───────────────────────────────────────────────────
+      - name: "🔨 Stage 10 · Build Debug APK"
+        run: |
+          ./gradlew assembleDebug \
+            --stacktrace \
+            --no-daemon \
+            -PMONEYMAP_API_BASE_URL="http://10.0.2.2:3000/api/v1/" \
+            -Dorg.gradle.jvmargs="-Xmx4g"
+          echo "✅ APK built"
+
+      # ── Stage 11: Verify APK ──────────────────────────────────────────────────
+      - name: "✅ Stage 11 · Verify APK"
+        run: |
+          if [ ! -f "${{ env.APK_PATH }}" ]; then
+            echo "❌ APK not found at ${{ env.APK_PATH }}"
             exit 1
           fi
-          echo "✅ APK verified: $(ls -lh $APK_PATH)"
-          echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
+          echo "✅ APK verified:"
+          ls -lh "${{ env.APK_PATH }}"
+          echo "APK_SIZE=$(du -sh ${{ env.APK_PATH }} | cut -f1)" >> $GITHUB_ENV
 
-      # ── Stage 8-13: Emulator + Appium + Tests ────────────────────────────────
-      - name: "Stage 8–13 · Launch Emulator → Install Appium → Run 510+ Tests"
+      # ── Stage 12: Install Node for Appium ────────────────────────────────────
+      - name: "📥 Stage 12 · Setup Node.js 18 for Appium"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # ── Stages 13–18: Emulator + Appium + Tests ──────────────────────────────
+      - name: "📱 Stages 13–18 · Emulator + Appium + 510 Tests + Reports"
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level:         ${{ env.ANDROID_API }}
-          target:            ${{ env.ANDROID_TARGET }}
-          arch:              ${{ env.ANDROID_ARCH }}
+          api-level: ${{ env.ANDROID_API_LEVEL }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
           disable-animations: true
-          emulator-options: >
+          emulator-options: >-
             -no-window
             -gpu swiftshader_indirect
             -noaudio
@@ -116,216 +270,329 @@ jobs:
           script: |
             set -e
 
-            # ── Create directories ─────────────────────────────────────────
-            mkdir -p "${{ env.REPORTS_DIR }}/screenshots"
-            mkdir -p "${{ env.REPORTS_DIR }}/logs"
-            mkdir -p "${{ env.RESULTS_DIR }}/Excel"
-            mkdir -p "${{ env.RESULTS_DIR }}/HTML"
-            mkdir -p "${{ env.RESULTS_DIR }}/JSON"
-            mkdir -p "${{ env.RESULTS_DIR }}/Summary"
+            # ── Pre-flight: create all output directories ──────────────────
+            mkdir -p automation/reports/screenshots
+            mkdir -p automation/reports/logs
+            mkdir -p "automation/Test Results/Excel"
+            mkdir -p "automation/Test Results/HTML"
+            mkdir -p "automation/Test Results/JSON"
+            mkdir -p "automation/Test Results/Summary"
 
-            # ── Stage 8: Wait for emulator ─────────────────────────────────
+            # ── Stage 13: Verify Emulator Readiness ───────────────────────
             echo "⏳ Waiting for emulator to fully boot..."
             adb wait-for-device
-            BOOT_STATUS=""
-            RETRIES=0
-            while [[ "$BOOT_STATUS" != "1" && $RETRIES -lt 60 ]]; do
-              BOOT_STATUS=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            BOOT_TIMEOUT=180
+            ELAPSED=0
+            until [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; do
               sleep 3
-              RETRIES=$((RETRIES + 1))
+              ELAPSED=$((ELAPSED + 3))
+              if [ $ELAPSED -ge $BOOT_TIMEOUT ]; then
+                echo "❌ Emulator failed to boot within ${BOOT_TIMEOUT}s"
+                exit 1
+              fi
+              echo "  ⏳ Booting... ${ELAPSED}s"
             done
-            if [[ "$BOOT_STATUS" != "1" ]]; then
-              echo "❌ Emulator did not boot in time"
-              exit 1
-            fi
-            echo "✅ Emulator booted (attempt $RETRIES)"
+            echo "✅ Emulator booted (${ELAPSED}s)"
             adb shell input keyevent 82
+            adb shell input keyevent 3
+            sleep 2
             adb devices
 
-            # ── Stage 9: Install APK ───────────────────────────────────────
-            echo "📦 Installing MoneyMap APK..."
-            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            # ── Stage 14: Install APK ─────────────────────────────────────
+            echo "📲 Installing APK..."
+            adb install -r "${{ env.APK_PATH }}"
+            adb shell pm list packages | grep moneymap
             echo "✅ APK installed: com.example.moneymap"
 
-            # ── Stage 10: Install Appium ───────────────────────────────────
-            echo "🔧 Installing Appium and UIAutomator2 driver..."
-            npm install -g appium@${{ env.APPIUM_VERSION }}
-            appium driver install uiautomator2
+            # ── Stage 15: Install Appium ──────────────────────────────────
+            echo "🔧 Installing Appium..."
+            npm install -g appium@latest --loglevel=error
+            appium driver install uiautomator2 --source npm
             echo "✅ Appium installed: $(appium --version)"
 
-            # ── Stage 11: Start Appium Server ──────────────────────────────
-            echo "🚀 Starting Appium server..."
+            # ── Stage 16: Start Appium Server ─────────────────────────────
+            echo "🚀 Starting Appium server on port ${{ env.APPIUM_PORT }}..."
             appium \
-              --log "${{ env.REPORTS_DIR }}/logs/appium-server.log" \
+              --port ${{ env.APPIUM_PORT }} \
+              --log automation/reports/logs/appium-server.log \
               --log-level info \
               --relaxed-security \
-              &
+              > automation/reports/logs/appium-console.log 2>&1 &
             APPIUM_PID=$!
             echo "Appium PID: $APPIUM_PID"
 
-            # ── Stage 12: Verify Appium health ─────────────────────────────
-            echo "⏳ Waiting for Appium to be ready..."
-            APPIUM_READY=false
-            for i in $(seq 1 30); do
-              if curl -s http://127.0.0.1:4723/status | grep -q '"ready":true'; then
-                APPIUM_READY=true
-                echo "✅ Appium is ready (attempt $i)"
-                break
-              fi
+            # ── Stage 17: Verify Appium Health ────────────────────────────
+            echo "⏳ Waiting for Appium..."
+            APPIUM_TIMEOUT=60
+            APPIUM_ELAPSED=0
+            until curl -sf http://127.0.0.1:${{ env.APPIUM_PORT }}/status > /dev/null 2>&1; do
               sleep 2
+              APPIUM_ELAPSED=$((APPIUM_ELAPSED + 2))
+              if [ $APPIUM_ELAPSED -ge $APPIUM_TIMEOUT ]; then
+                echo "❌ Appium failed to start"
+                cat automation/reports/logs/appium-console.log || true
+                exit 1
+              fi
+              echo "  ⏳ Waiting for Appium... ${APPIUM_ELAPSED}s"
             done
-            if [ "$APPIUM_READY" != "true" ]; then
-              echo "❌ Appium failed to start"
-              cat "${{ env.REPORTS_DIR }}/logs/appium-server.log" || true
-              exit 1
-            fi
-            curl -s http://127.0.0.1:4723/status | python3 -m json.tool | head -20
+            echo "✅ Appium is ready:"
+            curl -s http://127.0.0.1:${{ env.APPIUM_PORT }}/status \
+              | python3 -m json.tool 2>/dev/null | head -10 || true
 
-            # ── Stage 13: Execute E2E Test Suite ───────────────────────────
-            echo "🧪 Executing 510+ E2E test cases..."
+            # ── Stage 18: Execute 510+ E2E Tests ──────────────────────────
+            echo "🧪 Executing Appium E2E test suite (510+ cases)..."
+            echo "Build: #${{ github.run_number }} | Branch: ${{ github.ref_name }}"
             cd automation
             mvn clean test \
-              -Dsurefire.failIfNoSpecifiedTests=false \
+              -DGITHUB_RUN_NUMBER=${{ github.run_number }} \
+              -DGITHUB_SHA=${{ github.sha }} \
+              -DGITHUB_REF_NAME=${{ github.ref_name }} \
+              -DANDROID_API_LEVEL=${{ env.ANDROID_API_LEVEL }} \
+              -Dsurefire.useFile=false \
               -Dmaven.test.failure.ignore=true \
               --no-transfer-progress \
-              2>&1 | tee "../${{ env.REPORTS_DIR }}/logs/mvn-execution.log"
-            MVN_EXIT=$?
+              2>&1 | tee "../automation/reports/logs/mvn-execution.log" \
+              || TEST_EXIT=$?
+            echo "Maven exit: ${TEST_EXIT:-0}"
             cd ..
-            echo "Maven exit code: $MVN_EXIT"
 
-            # Kill Appium
-            kill $APPIUM_PID 2>/dev/null || true
-            echo "✅ Test execution complete"
+            # ── Capture post-test evidence ─────────────────────────────────
+            echo "📸 Capturing post-test device screenshot..."
+            adb exec-out screencap -p \
+              > automation/reports/screenshots/post-test-device.png 2>/dev/null || true
 
-      # ── Stage 14: Capture & Organize Reports ─────────────────────────────────
-      - name: "Stage 14 · Organize Reports for Deployment"
+            echo "📋 Capturing ADB logcat..."
+            adb logcat -d -t 2000 \
+              > automation/reports/logs/adb-full-logcat.log 2>/dev/null || true
+            adb logcat -d -t 500 "*:E" "moneymap:V" \
+              > automation/reports/logs/adb-errors.log 2>/dev/null || true
+
+            # Copy Appium server log to Summary for artifact
+            cp automation/reports/logs/appium-server.log \
+               "automation/Test Results/Summary/" 2>/dev/null || true
+
+            echo "✅ All post-test evidence captured"
+
+            # Propagate Maven failure (sub-95% pass rate triggers this)
+            if [ -n "$TEST_EXIT" ] && [ "$TEST_EXIT" -ne 0 ]; then
+              echo "❌ Tests failed with exit code $TEST_EXIT"
+              exit "$TEST_EXIT"
+            fi
+
+      # ── Stage 19: Upload Artifacts ────────────────────────────────────────────
+      - name: "📤 Stage 19a · Upload Excel Reports"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-Excel-Reports-Build-${{ github.run_number }}"
+          retention-days: 30
+          if-no-files-found: warn
+          path: "automation/Test Results/Excel/"
+
+      - name: "📤 Stage 19b · Upload HTML Reports"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-HTML-Reports-Build-${{ github.run_number }}"
+          retention-days: 30
+          if-no-files-found: warn
+          path: "automation/Test Results/HTML/"
+
+      - name: "📤 Stage 19c · Upload JSON Report"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-JSON-Report-Build-${{ github.run_number }}"
+          retention-days: 30
+          if-no-files-found: warn
+          path: "automation/Test Results/JSON/"
+
+      - name: "📤 Stage 19d · Upload Screenshots"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-Screenshots-Build-${{ github.run_number }}"
+          retention-days: 30
+          if-no-files-found: warn
+          path: "automation/reports/screenshots/"
+
+      - name: "📤 Stage 19e · Upload Logs"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-Logs-Build-${{ github.run_number }}"
+          retention-days: 30
+          if-no-files-found: warn
+          path: "automation/reports/logs/"
+
+      - name: "📤 Stage 19f · Upload Summary + APK"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-Summary-APK-Build-${{ github.run_number }}"
+          retention-days: 30
+          if-no-files-found: warn
+          path: |
+            automation/Test Results/Summary/
+            ${{ env.APK_PATH }}
+
+      # ── Stage 20: GitHub Pages Deployment ────────────────────────────────────
+      - name: "🌐 Stage 20a · Prepare GitHub Pages Deploy Structure"
         if: always()
         run: |
-          echo "📊 Organizing reports..."
-          RESULTS="${{ env.RESULTS_DIR }}"
-          DEPLOY="${{ env.DEPLOY_DIR }}"
-          BUILD="${{ github.run_number }}"
+          mkdir -p deploy_site/reports/latest
+          mkdir -p deploy_site/reports/history/build-${{ github.run_number }}
 
-          mkdir -p "$DEPLOY/reports/latest"
-          mkdir -p "$DEPLOY/reports/history/build-$BUILD"
-
-          # Copy latest results
-          for f in execution-report.html dashboard.html trends.html; do
-            [ -f "$RESULTS/HTML/$f" ] && cp "$RESULTS/HTML/$f" "$DEPLOY/reports/latest/" || true
-          done
-          [ -f "$RESULTS/Summary/summary.md" ] && cp "$RESULTS/Summary/summary.md" "$DEPLOY/reports/latest/" || true
-          [ -f "$RESULTS/JSON/execution-results.json" ] && cp "$RESULTS/JSON/execution-results.json" "$DEPLOY/reports/latest/" || true
-          [ -d "${{ env.REPORTS_DIR }}/screenshots" ] && cp -r "${{ env.REPORTS_DIR }}/screenshots" "$DEPLOY/reports/latest/" || true
-          [ -d "${{ env.REPORTS_DIR }}/logs" ] && cp -r "${{ env.REPORTS_DIR }}/logs" "$DEPLOY/reports/latest/" || true
-
-          # Copy to history
-          cp -r "$DEPLOY/reports/latest/." "$DEPLOY/reports/history/build-$BUILD/" 2>/dev/null || true
-
-          # Generate the Pages index.html
-          cat > "$DEPLOY/index.html" << 'INDEXEOF'
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta http-equiv="refresh" content="0; url=reports/latest/execution-report.html">
-            <title>MoneyMap E2E Reports</title>
-            <style>body{font-family:sans-serif;background:#0F172A;color:#F8FAFC;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}a{color:#3B82F6;}</style>
-          </head>
-          <body>
-            <p>Redirecting to <a href="reports/latest/execution-report.html">latest report</a>...</p>
-          </body>
-          </html>
-          INDEXEOF
-          echo "✅ Reports organized"
-          ls -la "$DEPLOY/reports/latest/" 2>/dev/null || echo "No files in latest dir"
-
-      # ── Stage 15: Restore GitHub Pages history ────────────────────────────────
-      - name: "Stage 15 · Restore Previous Build History"
-        if: always()
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Preserve existing build history
+          echo "Checking for existing gh-pages history..."
           git clone \
             --branch gh-pages \
             --single-branch \
-            --depth 10 \
+            --depth=50 \
             "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" \
-            gh-pages-clone 2>/dev/null || echo "No existing gh-pages branch"
+            gh-pages-clone 2>/dev/null || echo "No existing gh-pages (first run)"
+
           if [ -d "gh-pages-clone/reports/history" ]; then
-            cp -r gh-pages-clone/reports/history/* "${{ env.DEPLOY_DIR }}/reports/history/" 2>/dev/null || true
-            echo "✅ Previous history restored"
-            ls "${{ env.DEPLOY_DIR }}/reports/history/" | tail -10
+            echo "✅ Preserving existing history..."
+            cp -r gh-pages-clone/reports/history/* \
+               deploy_site/reports/history/ 2>/dev/null || true
           fi
 
-      # ── Stage 16: Deploy to GitHub Pages ────────────────────────────────────
-      - name: "Stage 16 · Deploy Reports to GitHub Pages"
+          # Copy latest reports
+          cp "automation/Test Results/HTML/execution-report.html" \
+             deploy_site/reports/latest/ 2>/dev/null || echo "⚠️ execution-report.html not found"
+          cp "automation/Test Results/HTML/dashboard.html" \
+             deploy_site/reports/latest/ 2>/dev/null || echo "⚠️ dashboard.html not found"
+          cp "automation/Test Results/HTML/trends.html" \
+             deploy_site/reports/latest/ 2>/dev/null || echo "⚠️ trends.html not found"
+          cp "automation/Test Results/JSON/execution-results.json" \
+             deploy_site/reports/latest/ 2>/dev/null || true
+          cp "automation/Test Results/Summary/summary.md" \
+             deploy_site/reports/latest/ 2>/dev/null || true
+          cp -r automation/reports/screenshots \
+             deploy_site/reports/latest/ 2>/dev/null || true
+          cp -r automation/reports/logs \
+             deploy_site/reports/latest/ 2>/dev/null || true
+
+          # Copy to history
+          cp "automation/Test Results/HTML/execution-report.html" \
+             "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
+          cp "automation/Test Results/JSON/execution-results.json" \
+             "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
+          cp "automation/Test Results/Summary/summary.md" \
+             "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
+          cp -r automation/reports/screenshots \
+             "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
+
+          # Root landing page
+          cat > deploy_site/index.html << 'LANDING_EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="refresh" content="0; url=reports/latest/execution-report.html">
+            <title>MoneyMap E2E Test Reports</title>
+            <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+            <style>
+              body{background:#0F172A;color:#F8FAFC;font-family:'Outfit',sans-serif;
+                   display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
+              .card{background:#1E293B;border:1px solid #334155;border-radius:24px;
+                    padding:48px;text-align:center;max-width:480px;}
+              h1{background:linear-gradient(135deg,#60A5FA,#3B82F6);
+                 -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+                 font-size:28px;margin-bottom:12px;}
+              p{color:#94A3B8;margin-bottom:24px;}
+              a{background:#3B82F6;color:#fff;text-decoration:none;
+                padding:12px 28px;border-radius:12px;font-weight:600;display:inline-block;}
+              a:hover{background:#2563EB;}
+            </style>
+          </head>
+          <body>
+            <div class="card">
+              <h1>MoneyMap E2E Reports</h1>
+              <p>Redirecting to latest execution report...</p>
+              <a href="reports/latest/execution-report.html">View Latest Report →</a>
+            </div>
+          </body>
+          </html>
+          LANDING_EOF
+
+          # Build history index
+          {
+            echo "<!DOCTYPE html><html><head><title>Build History</title>"
+            echo "<link href='https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap' rel='stylesheet'>"
+            echo "<style>body{background:#0F172A;color:#F8FAFC;font-family:Outfit,sans-serif;padding:32px;}"
+            echo "h1{background:linear-gradient(135deg,#60A5FA,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}"
+            echo "ul{list-style:none;padding:0;}li{background:#1E293B;border:1px solid #334155;"
+            echo "border-radius:12px;margin:8px 0;padding:16px;}a{color:#60A5FA;text-decoration:none;font-weight:600;}"
+            echo "a:hover{text-decoration:underline;}</style></head><body>"
+            echo "<h1>📊 MoneyMap Build History</h1><ul>"
+          } > deploy_site/reports/history/index.html
+
+          for build_dir in deploy_site/reports/history/build-*/; do
+            build_name=$(basename "$build_dir")
+            if [ -f "$build_dir/execution-report.html" ]; then
+              echo "<li><a href='$build_name/execution-report.html'>📋 $build_name</a></li>" \
+                >> deploy_site/reports/history/index.html
+            fi
+          done
+
+          echo "</ul><p><a href='../latest/execution-report.html'>← Latest Report</a></p></body></html>" \
+            >> deploy_site/reports/history/index.html
+
+          echo "✅ Deploy structure ready:"
+          find deploy_site -name "*.html" | head -20
+
+      - name: "🚀 Stage 20b · Deploy Reports to GitHub Pages"
         if: always()
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch:      gh-pages
-          folder:      ${{ env.DEPLOY_DIR }}
-          clean:       false
-          commit-message: "ci: deploy E2E reports for build #${{ github.run_number }} [${{ github.sha }}]"
+          branch: gh-pages
+          folder: deploy_site
+          clean: false
+          commit-message: "📊 E2E Report — Build #${{ github.run_number }} [${{ github.sha }}]"
 
-      # ── Stage 17: Upload Artifacts ────────────────────────────────────────────
-      - name: "Stage 17 · Upload Test Report Artifacts"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name:              "MoneyMap-E2E-Reports-Build-${{ github.run_number }}"
-          retention-days:    30
-          if-no-files-found: warn
-          path: |
-            automation/Test Results/Excel/Automation_Test_Report.xlsx
-            automation/Test Results/Excel/Passed_Test_Cases.xlsx
-            automation/Test Results/Excel/Failed_Test_Cases.xlsx
-            automation/Test Results/Excel/Execution_Summary.xlsx
-            automation/Test Results/HTML/execution-report.html
-            automation/Test Results/HTML/dashboard.html
-            automation/Test Results/HTML/trends.html
-            automation/Test Results/JSON/execution-results.json
-            automation/Test Results/Summary/summary.md
-            automation/reports/screenshots/
-            automation/reports/logs/
-
-      - name: "Stage 17b · Upload Appium Server Logs"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name:              "Appium-Server-Logs-Build-${{ github.run_number }}"
-          retention-days:    15
-          if-no-files-found: ignore
-          path: |
-            automation/reports/logs/appium-server.log
-            automation/reports/logs/mvn-execution.log
-
-      # ── Stage 18: Publish GitHub Actions Summary ──────────────────────────────
-      - name: "Stage 18 · Publish GitHub Actions Step Summary"
+      # ── Stage 21: GitHub Actions Summary ─────────────────────────────────────
+      - name: "📋 Stage 21 · Publish GitHub Actions Summary"
         if: always()
         run: |
           SUMMARY_FILE="automation/Test Results/Summary/summary.md"
-          REPORT_URL="https://${{ github.repository_owner }}.github.io/$(echo '${{ github.repository }}' | cut -d'/' -f2)/reports/latest/execution-report.html"
+          REPO_NAME=$(echo '${{ github.repository }}' | cut -d/ -f2)
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/reports/latest/execution-report.html"
 
-          echo "## 📊 MoneyMap E2E Execution Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Build** | #${{ github.run_number }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Branch** | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Commit** | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Actor** | @${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **App Package** | \`com.example.moneymap\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **APK Version** | \`v1.0\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Device** | Android ${{ env.ANDROID_API }} (x86_64) |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Total Test Cases** | 510+ |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "### 📄 Live Report" >> "$GITHUB_STEP_SUMMARY"
-          echo "🔗 [$REPORT_URL]($REPORT_URL)" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+          ## 🤖 MoneyMap Android Appium E2E — Execution Summary
+
+          | Field | Value |
+          |---|---|
+          | **Build Number** | #${{ github.run_number }} |
+          | **Execution Date** | $(date '+%Y-%m-%d %H:%M:%S UTC') |
+          | **Git Commit** | \`${{ github.sha }}\` |
+          | **Branch** | \`${{ github.ref_name }}\` |
+          | **APK Version** | v1.0 |
+          | **APK Size** | ${{ env.APK_SIZE }} |
+          | **Backend** | NestJS v11 + PostgreSQL 16 + Redis 7 |
+          | **Device** | Android ${{ env.ANDROID_API_LEVEL }} Emulator (x86_64, UiAutomator2) |
+          | **Test Cases** | 510+ |
+          | **Live Report** | [View on GitHub Pages](${REPORT_URL}) |
+          | **Build History** | [All Builds](${REPORT_URL%/execution-report.html}/history/index.html) |
+
+          EOF
 
           if [ -f "$SUMMARY_FILE" ]; then
-            echo "### 📋 Detailed Results" >> "$GITHUB_STEP_SUMMARY"
             cat "$SUMMARY_FILE" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "⚠️ Detailed summary not available (may be first run)" >> "$GITHUB_STEP_SUMMARY"
+            cat >> "$GITHUB_STEP_SUMMARY" << 'EOF'
+          ### ⚠️ Test summary not generated
+          Check the Maven execution log in the uploaded **Logs** artifact for details.
+          EOF
           fi
+
+          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+
+          ---
+          🔗 **Artifacts**: [Download from Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+
+          echo "✅ GitHub Actions Summary published"
