@@ -61,7 +61,31 @@ public class BaseTest {
         long duration = System.currentTimeMillis() - suiteStartTime;
         LogUtil.log("============================================================");
         LogUtil.log(" Suite Complete. Duration: " + (duration / 1000) + "s");
-        generateAllReports(duration);
+        LogUtil.log(" Total test cases loaded: " + testCases.size());
+        
+        // Count test statuses
+        int passed = 0, failed = 0, skipped = 0, notRun = 0;
+        for (TestCase tc : testCases) {
+            String status = tc.getStatus().toUpperCase();
+            switch (status) {
+                case "PASSED": passed++; break;
+                case "FAILED": failed++; break;
+                case "SKIPPED": skipped++; break;
+                default: notRun++; break;
+            }
+        }
+        LogUtil.log(" Test Results: Passed=" + passed + " Failed=" + failed + 
+                    " Skipped=" + skipped + " NotRun=" + notRun);
+        
+        try {
+            generateAllReports(duration);
+            LogUtil.log(" ✓ Reports generation completed successfully");
+        } catch (Exception e) {
+            LogUtil.logError("❌ CRITICAL: Report generation failed", e);
+            e.printStackTrace();
+            // Don't throw - let threshold enforcement run
+        }
+        
         enforcePassRateThreshold();
     }
 
@@ -150,24 +174,85 @@ public class BaseTest {
 
     private void generateAllReports(long durationMs) {
         String resultsDir = resolveResultsDir();
+        LogUtil.log("Report generation starting...");
+        LogUtil.log("Results directory: " + resultsDir);
+        LogUtil.log("Test cases to report: " + testCases.size());
+        
         mkdirs(resultsDir + "/Excel");
         mkdirs(resultsDir + "/HTML");
         mkdirs(resultsDir + "/JSON");
         mkdirs(resultsDir + "/Summary");
+        
+        LogUtil.log("Created directories:");
+        LogUtil.log("  - " + resultsDir + "/Excel");
+        LogUtil.log("  - " + resultsDir + "/HTML");
+        LogUtil.log("  - " + resultsDir + "/JSON");
+        LogUtil.log("  - " + resultsDir + "/Summary");
 
-        LogUtil.log("Generating Excel reports...");
-        ExcelReportGenerator.generateReports(testCases, resultsDir + "/Excel");
+        try {
+            LogUtil.log("Generating Excel reports...");
+            ExcelReportGenerator.generateReports(testCases, resultsDir + "/Excel");
+            LogUtil.log("✓ Excel reports completed");
+        } catch (Exception e) {
+            LogUtil.logError("❌ Excel report generation failed", e);
+            e.printStackTrace();
+        }
 
-        LogUtil.log("Generating HTML reports...");
-        HTMLReportGenerator.generateReports(testCases, resultsDir + "/HTML");
+        try {
+            LogUtil.log("Generating HTML reports...");
+            HTMLReportGenerator.generateReports(testCases, resultsDir + "/HTML");
+            LogUtil.log("✓ HTML reports completed");
+        } catch (Exception e) {
+            LogUtil.logError("❌ HTML report generation failed", e);
+            e.printStackTrace();
+        }
 
-        LogUtil.log("Generating JSON report...");
-        generateJsonReport(resultsDir + "/JSON/execution-results.json");
+        try {
+            LogUtil.log("Generating JSON report...");
+            generateJsonReport(resultsDir + "/JSON/execution-results.json");
+            LogUtil.log("✓ JSON report completed");
+        } catch (Exception e) {
+            LogUtil.logError("❌ JSON report generation failed", e);
+            e.printStackTrace();
+        }
 
-        LogUtil.log("Generating Markdown summary...");
-        generateMarkdownSummary(resultsDir + "/Summary/summary.md", durationMs);
+        try {
+            LogUtil.log("Generating Markdown summary...");
+            generateMarkdownSummary(resultsDir + "/Summary/summary.md", durationMs);
+            LogUtil.log("✓ Markdown summary completed");
+        } catch (Exception e) {
+            LogUtil.logError("❌ Markdown summary generation failed", e);
+            e.printStackTrace();
+        }
 
         LogUtil.log("All reports generated in: " + resultsDir);
+        
+        // List generated files for verification
+        try {
+            LogUtil.log("Verifying generated files:");
+            File excelDir = new File(resultsDir + "/Excel");
+            if (excelDir.exists()) {
+                File[] excelFiles = excelDir.listFiles();
+                LogUtil.log("Excel files: " + (excelFiles != null ? excelFiles.length : 0));
+                if (excelFiles != null) {
+                    for (File f : excelFiles) {
+                        LogUtil.log("  - " + f.getName() + " (" + f.length() + " bytes)");
+                    }
+                }
+            }
+            File htmlDir = new File(resultsDir + "/HTML");
+            if (htmlDir.exists()) {
+                File[] htmlFiles = htmlDir.listFiles();
+                LogUtil.log("HTML files: " + (htmlFiles != null ? htmlFiles.length : 0));
+                if (htmlFiles != null) {
+                    for (File f : htmlFiles) {
+                        LogUtil.log("  - " + f.getName() + " (" + f.length() + " bytes)");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LogUtil.logError("Could not list generated files", e);
+        }
     }
 
     private String resolveResultsDir() {

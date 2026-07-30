@@ -44,8 +44,8 @@ echo "APK installed"
 
 # Install Appium
 echo "Installing Appium..."
-npm install -g appium@latest --loglevel=error
-appium driver install uiautomator2 --source npm
+npm install -g appium@2.11.5 --loglevel=error
+appium driver install uiautomator2
 echo "Appium installed"
 
 # Start Appium server
