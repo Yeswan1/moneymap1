@@ -86,6 +86,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      # Redis service kept available in case backend modules use it
+      # Currently not used in app.module.ts — safe to have running
       redis:
         image: redis:7-alpine
         ports:
@@ -166,11 +168,27 @@ jobs:
           cd backend
           npm run build
           echo "✅ NestJS build complete"
+          # Verify the built output exists before proceeding
+          ls -la dist/ || echo "⚠️ dist directory listing failed"
+          if [ ! -f "dist/main.js" ]; then
+            echo "⚠️ dist/main.js not found — trying to locate entry file..."
+            find dist -name "*.js" | head -5 || echo "No JS files in dist"
+          fi
 
       # ── Stage 7: Start Backend Server ────────────────────────────────────────
       - name: "🚀 Stage 7 · Start NestJS Backend Server"
         run: |
           cd backend
+          # Find the correct entry point
+          if [ -f "dist/main.js" ]; then
+            ENTRY="dist/main.js"
+          elif [ -f "dist/src/main.js" ]; then
+            ENTRY="dist/src/main.js"
+          else
+            ENTRY=$(find dist -name "main.js" 2>/dev/null | head -1)
+          fi
+          echo "Starting NestJS with entry: $ENTRY"
+
           NODE_ENV=development \
           PORT=3000 \
           API_PREFIX=api/v1 \
@@ -183,9 +201,9 @@ jobs:
           REDIS_PORT=6379 \
           REDIS_PASSWORD="" \
           CORS_ORIGINS="*" \
-          npm run start:prod &
+          node "$ENTRY" &
 
-          echo "NestJS server starting in background..."
+          echo "NestJS server starting in background (PID: $!)..."
           cd ..
 
       # ── Stage 8: Verify Backend Health ───────────────────────────────────────
@@ -283,14 +301,20 @@ jobs:
             adb wait-for-device
             BOOT_TIMEOUT=180
             ELAPSED=0
-            until [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; do
-              sleep 3
-              ELAPSED=$((ELAPSED + 3))
-              if [ $ELAPSED -ge $BOOT_TIMEOUT ]; then
-                echo "❌ Emulator failed to boot within ${BOOT_TIMEOUT}s"
-                exit 1
+            BOOT_DONE=0
+            while [ "$BOOT_DONE" = "0" ]; do
+              RESULT=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+              if [ "$RESULT" = "1" ]; then
+                BOOT_DONE=1
+              else
+                sleep 3
+                ELAPSED=$((ELAPSED + 3))
+                if [ "$ELAPSED" -ge "$BOOT_TIMEOUT" ]; then
+                  echo "❌ Emulator failed to boot within ${BOOT_TIMEOUT}s"
+                  exit 1
+                fi
+                echo "  ⏳ Booting... ${ELAPSED}s"
               fi
-              echo "  ⏳ Booting... ${ELAPSED}s"
             done
             echo "✅ Emulator booted (${ELAPSED}s)"
             adb shell input keyevent 82
@@ -325,15 +349,20 @@ jobs:
             echo "⏳ Waiting for Appium..."
             APPIUM_TIMEOUT=60
             APPIUM_ELAPSED=0
-            until curl -sf http://127.0.0.1:${{ env.APPIUM_PORT }}/status > /dev/null 2>&1; do
-              sleep 2
-              APPIUM_ELAPSED=$((APPIUM_ELAPSED + 2))
-              if [ $APPIUM_ELAPSED -ge $APPIUM_TIMEOUT ]; then
-                echo "❌ Appium failed to start"
-                cat automation/reports/logs/appium-console.log || true
-                exit 1
+            APPIUM_READY=0
+            while [ "$APPIUM_READY" = "0" ]; do
+              if curl -sf http://127.0.0.1:${{ env.APPIUM_PORT }}/status > /dev/null 2>&1; then
+                APPIUM_READY=1
+              else
+                sleep 2
+                APPIUM_ELAPSED=$((APPIUM_ELAPSED + 2))
+                if [ "$APPIUM_ELAPSED" -ge "$APPIUM_TIMEOUT" ]; then
+                  echo "❌ Appium failed to start"
+                  cat automation/reports/logs/appium-console.log || true
+                  exit 1
+                fi
+                echo "  ⏳ Waiting for Appium... ${APPIUM_ELAPSED}s"
               fi
-              echo "  ⏳ Waiting for Appium... ${APPIUM_ELAPSED}s"
             done
             echo "✅ Appium is ready:"
             curl -s http://127.0.0.1:${{ env.APPIUM_PORT }}/status \
@@ -484,39 +513,78 @@ jobs:
           cp -r automation/reports/screenshots \
              "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
 
-          # Root landing page
-          cat > deploy_site/index.html << 'LANDING_EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="refresh" content="0; url=reports/latest/execution-report.html">
-            <title>MoneyMap E2E Test Reports</title>
-            <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-            <style>
-              body{background:#0F172A;color:#F8FAFC;font-family:'Outfit',sans-serif;
-                   display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
-              .card{background:#1E293B;border:1px solid #334155;border-radius:24px;
-                    padding:48px;text-align:center;max-width:480px;}
-              h1{background:linear-gradient(135deg,#60A5FA,#3B82F6);
-                 -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-                 font-size:28px;margin-bottom:12px;}
-              p{color:#94A3B8;margin-bottom:24px;}
-              a{background:#3B82F6;color:#fff;text-decoration:none;
-                padding:12px 28px;border-radius:12px;font-weight:600;display:inline-block;}
-              a:hover{background:#2563EB;}
-            </style>
-          </head>
-          <body>
-            <div class="card">
-              <h1>MoneyMap E2E Reports</h1>
-              <p>Redirecting to latest execution report...</p>
-              <a href="reports/latest/execution-report.html">View Latest Report →</a>
-            </div>
-          </body>
-          </html>
-          LANDING_EOF
+          # ── Generate a status-aware landing page ────────────────
+          # Check if reports were actually generated
+          REPORT_EXISTS="false"
+          if [ -f "automation/Test Results/HTML/execution-report.html" ]; then
+            REPORT_EXISTS="true"
+          fi
+
+          BUILD_NUM="${{ github.run_number }}"
+          COMMIT="${{ github.sha }}"
+          SHORT_COMMIT="${COMMIT:0:8}"
+          BRANCH="${{ github.ref_name }}"
+          DATE_NOW=$(date '+%Y-%m-%d %H:%M UTC')
+
+          if [ "$REPORT_EXISTS" = "true" ]; then
+            BADGE_COLOR="#10B981"
+            BADGE_TEXT="✅ Tests Completed"
+            REDIRECT_META='<meta http-equiv="refresh" content="3; url=reports/latest/execution-report.html">'
+            CTA_HTML='<a href="reports/latest/execution-report.html">View Execution Report →</a><br><br><a href="reports/history/index.html" style="background:#334155;margin-top:8px">Build History</a>'
+            STATUS_MSG="Redirecting to report in 3 seconds..."
+          else
+            BADGE_COLOR="#EF4444"
+            BADGE_TEXT="⚠️ Pipeline Incomplete"
+            REDIRECT_META=""
+            CTA_HTML='<a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" target="_blank">View Pipeline Logs →</a><br><br><a href="reports/history/index.html" style="background:#334155;margin-top:8px">Previous Build History</a>'
+            STATUS_MSG="The pipeline did not complete successfully. Reports could not be generated."
+          fi
+
+          cat > deploy_site/index.html << LANDING_EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  ${REDIRECT_META}
+  <title>MoneyMap E2E Reports — Build #${BUILD_NUM}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0F172A;color:#F8FAFC;font-family:'Outfit',sans-serif;
+         display:flex;align-items:center;justify-content:center;min-height:100vh;}
+    .card{background:#1E293B;border:1px solid #334155;border-radius:24px;
+          padding:48px 40px;text-align:center;max-width:520px;width:90%;}
+    .logo{font-size:40px;margin-bottom:16px;}
+    h1{font-size:26px;font-weight:700;background:linear-gradient(135deg,#60A5FA,#3B82F6);
+       -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+    .badge{display:inline-block;background:${BADGE_COLOR};color:#fff;font-size:13px;
+           font-weight:600;padding:4px 14px;border-radius:999px;margin-bottom:20px;}
+    .meta{color:#64748B;font-size:13px;margin-bottom:24px;line-height:1.8;}
+    .meta span{color:#94A3B8;}
+    p.status{color:#94A3B8;font-size:14px;margin-bottom:28px;}
+    a{background:#3B82F6;color:#fff;text-decoration:none;padding:12px 28px;
+      border-radius:12px;font-weight:600;display:inline-block;font-size:15px;}
+    a:hover{background:#2563EB;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">📱</div>
+    <h1>MoneyMap E2E Reports</h1>
+    <div class="badge">${BADGE_TEXT}</div>
+    <div class="meta">
+      Build <span>#${BUILD_NUM}</span> &nbsp;·&nbsp;
+      Branch <span>${BRANCH}</span> &nbsp;·&nbsp;
+      Commit <span>${SHORT_COMMIT}</span><br>
+      <span>${DATE_NOW}</span>
+    </div>
+    <p class="status">${STATUS_MSG}</p>
+    ${CTA_HTML}
+  </div>
+</body>
+</html>
+LANDING_EOF
 
           # Build history index
           {
