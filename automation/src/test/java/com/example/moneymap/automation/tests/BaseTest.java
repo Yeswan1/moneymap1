@@ -129,13 +129,13 @@ public class BaseTest {
 
     private void generateSyntheticTestCases() {
         String[][] modules = {
-            {"Authentication",40}, {"Authorization",30}, {"Registration",20},
-            {"Profile Management",20}, {"Navigation",30}, {"Dashboard",20},
-            {"Forms",40}, {"CRUD Operations",40}, {"Search",20}, {"Filters",20},
-            {"Input Validation",40}, {"Error Handling",20}, {"Session Management",20},
-            {"Notifications",20}, {"File Upload",20}, {"Offline Handling",10},
-            {"Accessibility",20}, {"Responsive UI",10}, {"Performance Smoke Tests",20},
-            {"Regression Suite",50}
+            {"Authentication", "40"}, {"Authorization", "30"}, {"Registration", "20"},
+            {"Profile Management", "20"}, {"Navigation", "30"}, {"Dashboard", "20"},
+            {"Forms", "40"}, {"CRUD Operations", "40"}, {"Search", "20"}, {"Filters", "20"},
+            {"Input Validation", "40"}, {"Error Handling", "20"}, {"Session Management", "20"},
+            {"Notifications", "20"}, {"File Upload", "20"}, {"Offline Handling", "10"},
+            {"Accessibility", "20"}, {"Responsive UI", "10"}, {"Performance Smoke Tests", "20"},
+            {"Regression Suite", "50"}
         };
         int id = 1;
         for (String[] moduleInfo : modules) {

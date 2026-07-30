@@ -115,7 +115,7 @@ public class BasePage {
         click(byText(text));
     }
 
-    protected boolean isTextVisible(String text) {
+    public boolean isTextVisible(String text) {
         return isElementDisplayed(byText(text));
     }
 
@@ -156,7 +156,7 @@ public class BasePage {
 
     // ─── Navigation helpers ───────────────────────────────────────────────────
 
-    protected void pressBack() {
+    public void pressBack() {
         driver.navigate().back();
     }
 

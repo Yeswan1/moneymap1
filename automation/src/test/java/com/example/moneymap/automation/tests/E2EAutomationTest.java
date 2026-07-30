@@ -38,7 +38,7 @@ public class E2EAutomationTest extends BaseTest {
         long start = System.currentTimeMillis();
         try {
             if (driver == null) {
-                runSimulated(tc, start);
+                runGenericVerification(tc);
                 return;
             }
             dispatchToRealFlow(tc);
