@@ -4,6 +4,36 @@ This directory contains utility scripts used by the GitHub Actions CI/CD pipelin
 
 ## Scripts
 
+### `run-e2e-tests.sh`
+
+Main test execution script for Android emulator and Appium automation.
+
+**Purpose:**
+- Waits for Android emulator to fully boot
+- Installs the APK on the emulator
+- Sets up Appium server and UIAutomator2 driver
+- Executes 510+ Maven/TestNG test cases
+- Captures screenshots, logs, and test evidence
+
+**Usage:**
+```bash
+chmod +x run-e2e-tests.sh
+./run-e2e-tests.sh
+```
+
+**Environment Variables Required:**
+- `APK_PATH` - Path to the APK file to install
+- `APPIUM_PORT` - Port number for Appium server (default: 4723)
+- `GITHUB_RUN_NUMBER` - Build number for Maven properties
+- `GITHUB_SHA` - Commit SHA for Maven properties
+- `GITHUB_REF_NAME` - Branch name for Maven properties
+- `ANDROID_API_LEVEL` - Android API level being tested
+
+**Called by:**
+- `.github/workflows/android-e2e.yml` in Stage 12-18 (Emulator Appium Tests)
+
+---
+
 ### `generate-pages.py`
 
 Generates GitHub Pages HTML files for the E2E test report deployment.
