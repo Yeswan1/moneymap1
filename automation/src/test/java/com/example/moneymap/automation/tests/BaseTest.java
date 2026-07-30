@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class BaseTest {
 
-    protected AndroidDriver driver;
+    public AndroidDriver driver;
     public static final List<TestCase> testCases = Collections.synchronizedList(new ArrayList<>());
     public static long suiteStartTime;
     public static String buildNumber = System.getenv().getOrDefault("GITHUB_RUN_NUMBER", "local");

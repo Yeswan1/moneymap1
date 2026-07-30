@@ -90,9 +90,9 @@ automation/
 ### Prerequisites
 - Java 21+
 - Maven 3.8+
-- Node.js 18+
-- Android SDK (ANDROID_HOME set)
-- Android Emulator or physical device
+- Node.js 20+ (`node --version` must show v20.x or higher)
+- Android SDK (ANDROID_HOME set, API 35 system image installed)
+- Android Emulator or physical device (API 35, google_apis, x86_64)
 
 ### Step 1 — Build APK
 ```bash
@@ -113,9 +113,15 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ### Step 4 — Install & Start Appium
 ```bash
-npm install -g appium
-appium driver install uiautomator2
-appium &
+# Install Appium 3.x and UiAutomator2 driver
+npm install -g appium@3.0.0
+appium driver install uiautomator2@5.0.0
+
+# Start Appium server
+appium --port 4723 --relaxed-security &
+
+# Verify Appium is healthy
+curl http://127.0.0.1:4723/status
 ```
 
 ### Step 5 — Run Tests

@@ -1,0 +1,72 @@
+# MoneyMap API Load Test — Artillery Configuration
+#
+# Usage:
+#   npx artillery run artillery-load-test.yml
+#   npx artillery run --target http://myserver.com/api/v1 artillery-load-test.yml
+#
+# Phases:
+#   1. Baseline  — 60s at arrival rate 10 (≈100 concurrent sessions)
+#   2. Stress200 — 60s ramping to arrival rate 50 (≈200 concurrent sessions)
+
+config:
+  target: "http://localhost:3000/api/v1"
+  http:
+    timeout: 30
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+  phases:
+    - name: "Baseline (100 VUs)"
+      duration: 60
+      arrivalRate: 10
+
+    - name: "Stress 200 VUs"
+      duration: 60
+      arrivalRate: 20
+      rampTo: 50
+
+  plugins:
+    metrics-by-endpoint: {}
+
+scenarios:
+  - name: "Auth and Transactions Flow"
+    flow:
+      # Step 1: Login and capture JWT token
+      - post:
+          url: "/auth/login"
+          json:
+            email: "demo@moneymap.com"
+            password: "Password123!"
+          capture:
+            - json: "$.data.accessToken"
+              as: "token"
+
+      # Step 2: Get transactions list (authenticated)
+      - get:
+          url: "/transactions"
+          headers:
+            Authorization: "Bearer {{ token }}"
+
+      # Step 3: Create an expense transaction
+      - post:
+          url: "/transactions"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            amount: 150
+            type: "EXPENSE"
+            description: "Artillery load test"
+            transactionDate: "{{ $processEnvironment.TEST_DATE || '2025-01-15' }}"
+
+      # Step 4: Get budgets (authenticated)
+      - get:
+          url: "/budgets"
+          headers:
+            Authorization: "Bearer {{ token }}"
+
+      # Step 5: Get savings goals (authenticated)
+      - get:
+          url: "/savings-goals"
+          headers:
+            Authorization: "Bearer {{ token }}"

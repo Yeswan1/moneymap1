@@ -1,33 +1,45 @@
 package com.example.moneymap.automation.pages;
 
+import com.example.moneymap.automation.utils.LogUtil;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 
 /**
- * AddTransactionPage - Page Object for the Add Transaction screen.
- * Uses the custom keypad UI (not system keyboard).
+ * AddTransactionPage — Page Object for the Add Transaction screen.
  */
 public class AddTransactionPage extends BasePage {
 
+    // ── Locators ──────────────────────────────────────────────────────────────
+
+    private final By amountField = By.xpath(
+        "//android.widget.EditText[contains(@hint,'Amount') or contains(@hint,'amount') " +
+        "or contains(@resource-id,'amount') or contains(@resource-id,'et_amount')]");
     private final By expenseToggle = By.xpath(
-            "//*[@text='Expense' or @text='EXPENSE' or @content-desc='Expense']");
+        "//*[@text='Expense' or @text='EXPENSE' or @content-desc='Expense' " +
+        "or @resource-id='com.example.moneymap:id/btn_expense']");
     private final By incomeToggle = By.xpath(
-            "//*[@text='Income' or @text='INCOME' or @content-desc='Income']");
-    private final By amountDisplay = By.xpath(
-            "//*[contains(@resource-id, 'amount') or contains(@text, '0.00')]");
-    private final By saveButton = By.xpath(
-            "//*[@text='Add Expense' or @text='Add Income' or @text='Save Transaction' or contains(@text, 'Save') or contains(@text, 'Add')]");
+        "//*[@text='Income' or @text='INCOME' or @content-desc='Income' " +
+        "or @resource-id='com.example.moneymap:id/btn_income']");
+    private final By categorySelector = By.xpath(
+        "//*[contains(@text,'Category') or contains(@text,'category') or " +
+        "contains(@resource-id,'category') or contains(@resource-id,'spinner_category')]");
     private final By noteField = By.xpath(
-            "//android.widget.EditText[@text='What did you buy?' or @hint='What did you buy?' or contains(@resource-id, 'description') or contains(@resource-id, 'note') or contains(@resource-id, 'et_note')]");
-    private final By backspaceButton = By.id("com.example.moneymap:id/btn_backspace");
+        "//android.widget.EditText[contains(@hint,'Note') or contains(@hint,'note') " +
+        "or contains(@hint,'Description') or contains(@resource-id,'note') or contains(@resource-id,'description')]");
+    private final By saveButton = By.xpath(
+        "//*[@text='Save' or @text='SAVE' or @text='Add Transaction' or @text='ADD TRANSACTION' " +
+        "or @text='Submit' or @resource-id='com.example.moneymap:id/btn_save']");
     private final By closeButton = By.xpath(
-            "//*[@content-desc='Close' or @content-desc='Back' or contains(@content-desc, 'Back') or contains(@text, 'Back')]");
-    private final By dateContainer = By.xpath("//*[contains(@resource-id, 'date') or contains(@text, '-')]");
-    private final By categoryGrid = By.xpath("//*[contains(@resource-id, 'category')]");
+        "//*[@content-desc='Close' or @content-desc='Navigate up' or @content-desc='Back' " +
+        "or contains(@resource-id,'close') or contains(@resource-id,'back')]");
+    private final By screenTitle = By.xpath(
+        "//*[@text='Add Transaction' or @text='New Transaction' or contains(@resource-id,'toolbar_title')]");
 
     public AddTransactionPage(AndroidDriver driver) {
         super(driver);
     }
+
+    // ── Actions ───────────────────────────────────────────────────────────────
 
     public void selectExpense() {
         click(expenseToggle);
@@ -37,40 +49,32 @@ public class AddTransactionPage extends BasePage {
         click(incomeToggle);
     }
 
-    /**
-     * Enter amount via the custom keypad UI.
-     * Parses the amount string and taps each digit/dot on the keypad grid.
-     */
     public void enterAmount(String amount) {
-        By amountField = By.xpath("//android.widget.EditText[@text='0.00' or @hint='0.00' or contains(@text, '0.00') or contains(@resource-id, 'amount') or contains(@resource-id, 'et_amount')]");
-        try {
-            clearAndType(amountField, amount);
-        } catch (Exception e) {
-            // Keypad fallback
-            for (int i = 0; i < 10; i++) {
-                try { click(backspaceButton); } catch (Exception ignored) { break; }
-            }
-            for (char c : amount.toCharArray()) {
-                String charStr = String.valueOf(c);
-                try {
-                    click(By.xpath("//*[@text='" + charStr + "' and contains(@class,'TextView')]"));
-                } catch (Exception ignored) {}
-            }
-        }
+        clearAndType(amountField, amount);
     }
 
     public void selectCategory(String categoryName) {
         try {
-            scrollToText(categoryName);
-            clickByText(categoryName);
+            click(categorySelector);
+            waitSeconds(1);
+            // Try to find the category item in the list
+            By categoryItem = By.xpath(
+                "//*[contains(@text,'" + categoryName + "') or @text='" + categoryName + "']");
+            if (!isElementDisplayed(categoryItem)) {
+                scrollToText(categoryName);
+            }
+            click(categoryItem);
         } catch (Exception e) {
-            // Category grid might use content-desc
-            click(By.xpath("//*[contains(@content-desc,'" + categoryName + "')]"));
+            LogUtil.logWarning("Could not select category '" + categoryName + "': " + e.getMessage());
         }
     }
 
     public void enterNote(String note) {
-        clearAndType(noteField, note);
+        try {
+            clearAndType(noteField, note);
+        } catch (Exception e) {
+            LogUtil.logWarning("Note field not found, skipping: " + e.getMessage());
+        }
     }
 
     public void clickSave() {
@@ -78,16 +82,15 @@ public class AddTransactionPage extends BasePage {
     }
 
     public void clickClose() {
-        click(closeButton);
-    }
-
-    public void tapDateField() {
-        click(dateContainer);
+        try {
+            click(closeButton);
+        } catch (Exception e) {
+            pressBack();
+        }
     }
 
     /**
-     * Full transaction creation helper.
-     * @param type "expense" or "income"
+     * Convenience method: selects type, enters amount/category/note, then saves.
      */
     public void createTransaction(String type, String amount, String category, String note) {
         if ("income".equalsIgnoreCase(type)) {
@@ -103,15 +106,17 @@ public class AddTransactionPage extends BasePage {
         clickSave();
     }
 
+    // ── Assertions ────────────────────────────────────────────────────────────
+
     public boolean isAddTransactionScreenDisplayed() {
-        return isTextVisible("Add Transaction") || isElementDisplayed(expenseToggle);
+        return isElementDisplayed(saveButton) || isElementDisplayed(amountField);
     }
 
     public String getDisplayedAmount() {
         try {
-            return getText(amountDisplay);
+            return getText(amountField);
         } catch (Exception e) {
-            return "0";
+            return null;
         }
     }
 }

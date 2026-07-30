@@ -1,18 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="MoneyMap Android E2E - Reports Suite" verbose="1" thread-count="1">
-    <listeners>
-        <listener class-name="com.example.moneymap.automation.listeners.TestNGListener" />
-    </listeners>
-    <test name="Reports Shard Execution">
-        <groups>
-            <run>
-                <include name="e2e"/>
-                <include name="regression"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.example.moneymap.automation.tests.E2EAutomationTest"/>
-        </classes>
-    </test>
+<suite name="MoneyMap Reports Shard" verbose="1" parallel="none">
+
+  <listeners>
+    <listener class-name="com.example.moneymap.automation.listeners.TestNGListener"/>
+  </listeners>
+
+  <!-- Shard filter: everything not covered by auth/dashboard/transactions/budget/settings -->
+  <!-- Includes: offline, performance smoke tests, regression suite modules -->
+  <!-- Filtering is applied in BaseTest.shouldIncludeTestCase() via -DtestShard=reports -->
+  <test name="Reports Shard">
+    <classes>
+      <class name="com.example.moneymap.automation.tests.E2EAutomationTest"/>
+    </classes>
+  </test>
+
 </suite>

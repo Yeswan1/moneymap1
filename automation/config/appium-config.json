@@ -1,14 +1,17 @@
 {
   "platformName": "Android",
   "automationName": "UiAutomator2",
-  "deviceName": "Android Emulator",
-  "app": "c:/Users/surya/AndroidStudioProjects/Moneymap/app/build/outputs/apk/debug/app-debug.apk",
+  "deviceName": "I2214",
+  "udid": "adb-10BD4127600007X-pRQG3j._adb-tls-connect._tcp",
+  "platformVersion": "16",
+  "app": "C:/Users/surya/AndroidStudioProjects/Moneymap/app/build/outputs/apk/debug/app-debug.apk",
   "appPackage": "com.example.moneymap",
   "appActivity": "com.example.moneymap.MainActivity",
-  "noReset": false,
+  "noReset": true,
   "fullReset": false,
   "autoGrantPermissions": true,
   "newCommandTimeout": 300,
   "systemPort": 8200,
-  "adbExecTimeout": 120000
+  "adbExecTimeout": 120000,
+  "appiumUrl": "http://127.0.0.1:4723"
 }

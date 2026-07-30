@@ -31,7 +31,17 @@ public class TestCase {
         this.steps = steps;
         this.testData = testData;
         this.expectedResult = expectedResult;
-        this.status = "UNEXECUTED";
+        // Runtime output fields — all initialised to neutral defaults
+        this.actualResult = "";
+        this.status = "NOT_RUN";
+        this.durationMs = 0L;
+        this.screenshotPath = "";
+        this.deviceLogPath = "";
+        this.pageSourcePath = "";
+        this.appiumLogPath = "";
+        this.locatorUsed = "";
+        this.currentActivity = "";
+        this.currentPackage = "";
     }
 
     // Getters and Setters

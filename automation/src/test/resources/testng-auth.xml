@@ -1,18 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="MoneyMap Android E2E - Auth Suite" verbose="1" thread-count="1">
-    <listeners>
-        <listener class-name="com.example.moneymap.automation.listeners.TestNGListener" />
-    </listeners>
-    <test name="Auth Shard Execution">
-        <groups>
-            <run>
-                <include name="e2e"/>
-                <include name="regression"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.example.moneymap.automation.tests.E2EAutomationTest"/>
-        </classes>
-    </test>
+<suite name="MoneyMap Auth Shard" verbose="1" parallel="none">
+
+  <listeners>
+    <listener class-name="com.example.moneymap.automation.listeners.TestNGListener"/>
+  </listeners>
+
+  <!-- Shard filter: auth, register, session modules -->
+  <!-- Filtering is applied in BaseTest.shouldIncludeTestCase() via -DtestShard=auth -->
+  <test name="Auth Shard">
+    <classes>
+      <class name="com.example.moneymap.automation.tests.E2EAutomationTest"/>
+    </classes>
+  </test>
+
 </suite>

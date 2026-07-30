@@ -3,79 +3,64 @@ package com.example.moneymap.automation.utils;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * ScreenshotUtil - Captures screenshots and saves them to the reports directory.
+ * ScreenshotUtil — captures PNG screenshots on test failure.
+ *
+ * Files are saved to:
+ *   automation/reports/screenshots/<prefix>_<yyyyMMdd_HHmmss_SSS>.png
+ * or
+ *   reports/screenshots/<prefix>_<yyyyMMdd_HHmmss_SSS>.png
+ * depending on the working directory.
  */
 public class ScreenshotUtil {
 
-    private static String getScreenshotDir() {
-        // Prefer absolute test-results directories
-        if (new File("automation").exists()) {
-            return "automation/reports/screenshots/";
-        }
-        return "reports/screenshots/";
-    }
+    private static final String TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss_SSS";
 
     /**
-     * Capture a screenshot and save to the reports/screenshots directory.
-     * @param driver the AndroidDriver instance
-     * @param testCaseId used to name the file
-     * @return relative path to the screenshot (from the reports root)
+     * Captures a PNG screenshot from the given AndroidDriver and saves it with
+     * a timestamped filename.
+     *
+     * @param driver active AndroidDriver session (null-safe — returns "" if null)
+     * @param prefix typically the testId, e.g. "TC_AUTH_001"
+     * @return relative path to the saved screenshot file, or "" on failure
      */
-    public static String captureScreenshot(AndroidDriver driver, String testCaseId) {
-        if (driver == null) return "";
+    public static String captureScreenshot(AndroidDriver driver, String prefix) {
+        if (driver == null) {
+            LogUtil.logWarning("ScreenshotUtil: driver is null, skipping screenshot for " + prefix);
+            return "";
+        }
         try {
-            String screenshotDir = getScreenshotDir();
-            File dir = new File(screenshotDir);
-            if (!dir.exists()) dir.mkdirs();
+            String timestamp = new SimpleDateFormat(TIMESTAMP_FORMAT).format(new Date());
+            String safePrefix = (prefix != null && !prefix.isEmpty()) ? prefix : "unknown";
+            String fileName = safePrefix + "_" + timestamp + ".png";
 
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String fileName = testCaseId + "_" + timestamp + ".png";
-            File destFile = new File(dir, fileName);
+            File screenshotDir = resolveScreenshotDir();
+            screenshotDir.mkdirs();
 
-            File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File destFile = new File(screenshotDir, fileName);
+            File srcFile = driver.getScreenshotAs(OutputType.FILE);
             FileUtils.copyFile(srcFile, destFile);
-            LogUtil.log("Screenshot saved: " + destFile.getAbsolutePath());
-            return "screenshots/" + fileName;  // relative from reports/
+
+            String relativePath = screenshotDir.getPath() + File.separator + fileName;
+            LogUtil.log("Screenshot saved: " + relativePath);
+            return relativePath;
         } catch (Exception e) {
-            LogUtil.logError("Screenshot capture failed for " + testCaseId, e);
+            LogUtil.logError("ScreenshotUtil: failed to capture screenshot for " + prefix, e);
             return "";
         }
     }
 
-    /**
-     * Capture screenshot as Base64 (for embedding in HTML reports).
-     */
-    public static String captureBase64(AndroidDriver driver) {
-        if (driver == null) return "";
-        try {
-            return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BASE64);
-        } catch (Exception e) {
-            LogUtil.logError("Base64 screenshot capture failed", e);
-            return "";
-        }
-    }
+    // ── Path resolution ──────────────────────────────────────────────────────
 
-    /**
-     * Delete all screenshots older than a given number of days.
-     */
-    public static void cleanOldScreenshots(int daysOld) {
-        File dir = new File(getScreenshotDir());
-        if (!dir.exists()) return;
-        long threshold = System.currentTimeMillis() - (long) daysOld * 24 * 60 * 60 * 1000;
-        File[] files = dir.listFiles();
-        if (files == null) return;
-        for (File f : files) {
-            if (f.lastModified() < threshold) {
-                f.delete();
-            }
+    private static File resolveScreenshotDir() {
+        if (new File("automation").isDirectory()) {
+            return new File("automation/reports/screenshots");
         }
+        return new File("reports/screenshots");
     }
 }

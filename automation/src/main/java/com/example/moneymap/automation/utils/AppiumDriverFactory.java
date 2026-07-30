@@ -86,6 +86,14 @@ public class AppiumDriverFactory {
         options.setPlatformName(config.optString("platformName", "Android"));
         options.setAutomationName(config.optString("automationName", "UiAutomator2"));
         options.setDeviceName(config.optString("deviceName", "Android Emulator"));
+
+        // Set UDID so Appium targets the correct physical device (required for wireless ADB)
+        String udid = config.optString("udid", "");
+        if (!udid.isEmpty()) {
+            options.setUdid(udid);
+            LogUtil.log("Using device UDID: " + udid);
+        }
+
         options.setAppPackage(config.optString("appPackage", "com.example.moneymap"));
         options.setAppActivity(config.optString("appActivity", "com.example.moneymap.MainActivity"));
         options.setNoReset(config.optBoolean("noReset", false));

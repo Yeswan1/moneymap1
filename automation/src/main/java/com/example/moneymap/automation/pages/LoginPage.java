@@ -4,48 +4,42 @@ import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 
 /**
- * LoginPage - Page Object for the Compose LoginScreen.
- * Handles both the Compose-based login and the legacy LoginActivity.
- *
- * Compose elements are located via accessibility text/content-desc.
+ * LoginPage — Page Object for the MoneyMap login screen.
  */
 public class LoginPage extends BasePage {
 
-    // ─── Locators ─────────────────────────────────────────────────────────────
-    // Compose fields are located via unique text labels. No index-based XPath.
+    // ── Locators ──────────────────────────────────────────────────────────────
+
     private final By emailField = By.xpath(
-            "//android.widget.EditText[@text='Email Address' or @hint='Email Address' or contains(@text, 'Email')]");
-
+        "//android.widget.EditText[contains(@text,'Email') or contains(@hint,'Email') or contains(@text,'email')]");
     private final By passwordField = By.xpath(
-            "//android.widget.EditText[@text='Password' or @hint='Password' or contains(@text, 'Password')]");
-
-    private final By loginButton = By.xpath(
-            "//*[@text='Login' or @content-desc='Login']");
-
+        "//android.widget.EditText[contains(@text,'Password') or contains(@hint,'Password') or contains(@hint,'password')]");
+    private final By signInButton = By.xpath(
+        "//*[@text='Sign In' or @text='Login' or @text='LOG IN' or @text='SIGN IN' or @content-desc='Sign In']");
     private final By signUpLink = By.xpath(
-            "//*[@text='Sign Up' or @content-desc='Sign Up']");
-
+        "//*[@text='Sign Up' or @text='Create Account' or @text='Register' or contains(@text,'Sign up')]");
     private final By forgotPasswordLink = By.xpath(
-            "//*[@text='Forgot Password?' or @text='Forgot Password' or contains(@text, 'Forgot')]");
-
+        "//*[contains(@text,'Forgot') or contains(@text,'Reset Password')]");
     private final By googleButton = By.xpath(
-            "//*[@text='Continue with Google' or contains(@text, 'Google')]");
-
-    private final By rememberMeCheckbox = By.xpath(
-            "//*[contains(@resource-id, 'remember_me_checkbox') or @text='Remember me']");
-
+        "//*[contains(@text,'Google') or contains(@content-desc,'Google') or @resource-id='com.example.moneymap:id/btn_google_signin']");
     private final By passwordToggle = By.xpath(
-            "//*[@content-desc='Show password' or @content-desc='Hide password']");
-
-    private final By welcomeTitle = By.xpath(
-            "//*[@text='Welcome Back' or @text='Welcome Back!']");
+        "//*[@content-desc='Toggle password visibility' or contains(@resource-id,'password_toggle') or contains(@resource-id,'toggle')]");
+    private final By errorMessage = By.xpath(
+        "//*[contains(@text,'Invalid') or contains(@text,'invalid') or contains(@text,'credentials') or " +
+        "contains(@text,'error') or contains(@text,'Error') or contains(@text,'required') or contains(@text,'Required') or " +
+        "contains(@text,'incorrect') or contains(@text,'Incorrect') or contains(@text,'failed') or contains(@text,'Failed')]");
 
     public LoginPage(AndroidDriver driver) {
         super(driver);
-        ensureAppReady();
     }
 
-    // ─── Actions ──────────────────────────────────────────────────────────────
+    // ── Actions ───────────────────────────────────────────────────────────────
+
+    public void login(String email, String password) {
+        enterEmail(email);
+        enterPassword(password);
+        clickSignIn();
+    }
 
     public void enterEmail(String email) {
         clearAndType(emailField, email);
@@ -55,8 +49,8 @@ public class LoginPage extends BasePage {
         clearAndType(passwordField, password);
     }
 
-    public void clickLogin() {
-        click(loginButton);
+    public void clickSignIn() {
+        click(signInButton);
     }
 
     public void clickSignUp() {
@@ -67,39 +61,42 @@ public class LoginPage extends BasePage {
         click(forgotPasswordLink);
     }
 
-    public void clickContinueWithGoogle() {
-        click(googleButton);
-    }
-
     public void togglePasswordVisibility() {
         click(passwordToggle);
     }
 
-    public void toggleRememberMe() {
-        click(rememberMeCheckbox);
-    }
+    // ── Assertions ────────────────────────────────────────────────────────────
 
-    public void login(String email, String password) {
-        enterEmail(email);
-        enterPassword(password);
-        clickLogin();
-    }
-
-    // ─── Assertions ───────────────────────────────────────────────────────────
-
+    /**
+     * Returns true when both email and password fields are visible — confirms
+     * we are on the login screen.
+     */
     public boolean isLoginScreenDisplayed() {
-        return isElementPresent(emailField) && isElementPresent(passwordField);
+        return isElementDisplayed(emailField) && isElementDisplayed(passwordField);
     }
 
-    public boolean isErrorMessageDisplayed(String expectedError) {
-        return isElementDisplayed(byText(expectedError));
-    }
-
-    public boolean isTaglineVisible() {
-        return isTextVisible("Track Smart. Spend Smart.") || isTextVisible("Login to your account");
+    /**
+     * Returns true if an error/validation message containing the given fragment is visible.
+     */
+    public boolean isErrorMessageDisplayed(String messageFragment) {
+        if (messageFragment == null || messageFragment.isEmpty()) {
+            return isElementDisplayed(errorMessage);
+        }
+        By fragmentLocator = By.xpath(
+            "//*[contains(translate(@text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'" +
+            messageFragment.toLowerCase() + "')]");
+        return isElementDisplayed(fragmentLocator);
     }
 
     public boolean isGoogleButtonVisible() {
         return isElementDisplayed(googleButton);
+    }
+
+    public String getEmailFieldText() {
+        try {
+            return getText(emailField);
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

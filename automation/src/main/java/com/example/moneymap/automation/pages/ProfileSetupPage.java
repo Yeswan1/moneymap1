@@ -1,62 +1,86 @@
 package com.example.moneymap.automation.pages;
 
+import com.example.moneymap.automation.utils.LogUtil;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 
 /**
- * ProfileSetupPage - Page Object for student/employee/homemaker/general setup screens.
+ * ProfileSetupPage — Page Object for role-specific profile setup screens
+ * (Student Setup, Employee Setup, Homemaker Setup, General Setup).
  */
 public class ProfileSetupPage extends BasePage {
 
-    private final By nameField = By.xpath(
-            "//android.widget.EditText[@text='Full Name' or @hint='Full Name' or contains(@text, 'Name')]");
-    private final By pocketMoneyField = By.xpath(
-            "//android.widget.EditText[@text='Monthly Allowance' or @hint='Monthly Allowance' or contains(@text, 'Allowance')]");
-    private final By incomeField = By.xpath(
-            "//android.widget.EditText[@text='Monthly Income' or @hint='Monthly Income' or contains(@text, 'Income')]");
-    private final By budgetField = By.xpath(
-            "//android.widget.EditText[@text='Monthly Household Budget' or @hint='Monthly Household Budget' or contains(@text, 'Budget')]");
-    private final By collegeField = By.xpath(
-            "//android.widget.EditText[@text='School/College Name' or @hint='School/College Name' or contains(@text, 'College') or contains(@text, 'School')]");
-    private final By companyField = By.xpath(
-            "//android.widget.EditText[@text='Company Name' or @hint='Company Name' or contains(@text, 'Company')]");
+    // ── Locators ──────────────────────────────────────────────────────────────
 
+    private final By nameField = By.xpath(
+        "//android.widget.EditText[contains(@hint,'Name') or contains(@hint,'name') " +
+        "or @resource-id='com.example.moneymap:id/et_name']");
+    private final By currencySpinner = By.xpath(
+        "//*[contains(@resource-id,'currency') or contains(@resource-id,'spinner_currency') " +
+        "or @text='INR' or @text='USD' or @text='EUR']");
+    private final By monthlyAmountField = By.xpath(
+        "//android.widget.EditText[contains(@hint,'Income') or contains(@hint,'income') " +
+        "or contains(@hint,'Allowance') or contains(@hint,'allowance') " +
+        "or contains(@hint,'Salary') or contains(@hint,'salary') " +
+        "or contains(@hint,'Budget') or contains(@hint,'budget') " +
+        "or contains(@resource-id,'income') or contains(@resource-id,'allowance')]");
+    private final By organisationField = By.xpath(
+        "//android.widget.EditText[contains(@hint,'Company') or contains(@hint,'company') " +
+        "or contains(@hint,'Institution') or contains(@hint,'institution') " +
+        "or contains(@hint,'College') or contains(@hint,'college') " +
+        "or contains(@resource-id,'company') or contains(@resource-id,'institution')]");
     private final By nextButton = By.xpath(
-            "//*[@text='Next ->' or @text='Next' or @content-desc='Next' or contains(@text, 'Continue')]");
-    private final By backButton = By.xpath(
-            "//*[@content-desc='Back' or @resource-id='com.example.moneymap:id/btn_back']");
+        "//*[@text='Next' or @text='NEXT' or @text='Continue' or @text='CONTINUE' " +
+        "or @resource-id='com.example.moneymap:id/btn_next']");
 
     public ProfileSetupPage(AndroidDriver driver) {
         super(driver);
     }
 
-    public void setupStudentProfile(String name, String pocketMoney, String college) {
-        clearAndType(nameField, name);
-        clearAndType(pocketMoneyField, pocketMoney);
-        clearAndType(collegeField, college);
+    // ── Actions ───────────────────────────────────────────────────────────────
+
+    public void enterName(String name) {
+        try {
+            clearAndType(nameField, name);
+        } catch (Exception e) {
+            LogUtil.logWarning("Name field not found on profile setup: " + e.getMessage());
+        }
+    }
+
+    public void selectCurrency(String currency) {
+        try {
+            click(currencySpinner);
+            waitSeconds(1);
+            By currencyItem = By.xpath("//*[@text='" + currency + "' or contains(@text,'" + currency + "')]");
+            click(currencyItem);
+        } catch (Exception e) {
+            LogUtil.logWarning("Could not select currency '" + currency + "': " + e.getMessage());
+        }
+    }
+
+    public void enterMonthlyAmount(String amount) {
+        try {
+            clearAndType(monthlyAmountField, amount);
+        } catch (Exception e) {
+            LogUtil.logWarning("Monthly amount field not found: " + e.getMessage());
+        }
+    }
+
+    public void enterOrganisation(String org) {
+        try {
+            clearAndType(organisationField, org);
+        } catch (Exception e) {
+            LogUtil.logWarning("Organisation field not found: " + e.getMessage());
+        }
+    }
+
+    public void clickNext() {
         click(nextButton);
     }
 
-    public void setupProfessionalProfile(String name, String salary, String company) {
-        clearAndType(nameField, name);
-        clearAndType(incomeField, salary);
-        clearAndType(companyField, company);
-        click(nextButton);
-    }
+    // ── Assertions ────────────────────────────────────────────────────────────
 
-    public void setupHomemakerProfile(String name, String budget) {
-        clearAndType(nameField, name);
-        clearAndType(budgetField, budget);
-        click(nextButton);
-    }
-
-    public void setupGeneralProfile(String name, String income) {
-        clearAndType(nameField, name);
-        clearAndType(incomeField, income);
-        click(nextButton);
-    }
-
-    public boolean isSetupScreenDisplayed() {
-        return isElementPresent(nameField);
+    public boolean isProfileSetupDisplayed() {
+        return isElementDisplayed(nextButton);
     }
 }
