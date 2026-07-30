@@ -1,7 +1,6 @@
 package com.example.moneymap.automation.reporting;
 
 import com.example.moneymap.automation.model.TestCase;
-import com.example.moneymap.automation.tests.BaseTest;
 import com.example.moneymap.automation.utils.LogUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -14,15 +13,23 @@ import java.util.*;
 /**
  * ExcelReportGenerator - Produces 7-sheet XLSX reports.
  * Sheets: 1. All Tests  2. Passed  3. Failed  4. Skipped  5. Metrics  6. Defects  7. Pass Rate by Module
+ *
+ * NOTE: Does NOT import BaseTest — build/branch info is passed as parameters to avoid
+ * src/main importing from src/test (Maven source set violation).
  */
 public class ExcelReportGenerator {
 
     public static void generateReports(List<TestCase> testCases, String outputDirectory) {
+        generateReports(testCases, outputDirectory, "local", "main", "local");
+    }
+
+    public static void generateReports(List<TestCase> testCases, String outputDirectory,
+                                       String buildNumber, String branchName, String gitCommit) {
         new File(outputDirectory).mkdirs();
-        generateMasterReport  (testCases, outputDirectory + "/Automation_Test_Report.xlsx");
+        generateMasterReport  (testCases, outputDirectory + "/Automation_Test_Report.xlsx", buildNumber, branchName);
         generateStatusReport  (testCases, "PASSED",  outputDirectory + "/Passed_Test_Cases.xlsx");
         generateStatusReport  (testCases, "FAILED",  outputDirectory + "/Failed_Test_Cases.xlsx");
-        generateSummaryReport (testCases, outputDirectory + "/Execution_Summary.xlsx");
+        generateSummaryReport (testCases, outputDirectory + "/Execution_Summary.xlsx", buildNumber, branchName);
         LogUtil.log("Excel reports generated in: " + outputDirectory);
     }
 
@@ -30,7 +37,8 @@ public class ExcelReportGenerator {
     //  Master report — 7 sheets
     // ─────────────────────────────────────────────────────────────────────────
 
-    private static void generateMasterReport(List<TestCase> testCases, String filePath) {
+    private static void generateMasterReport(List<TestCase> testCases, String filePath,
+                                              String buildNumber, String branchName) {
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             Styles s = new Styles(wb);
 
@@ -52,7 +60,7 @@ public class ExcelReportGenerator {
 
             // Sheet 5: Execution Metrics
             XSSFSheet s5 = wb.createSheet("Execution Metrics");
-            writeMetricsSheet(s5, testCases, s, wb);
+            writeMetricsSheet(s5, testCases, s, wb, buildNumber, branchName);
 
             // Sheet 6: Defect Summary
             XSSFSheet s6 = wb.createSheet("Defect Summary");
@@ -79,11 +87,12 @@ public class ExcelReportGenerator {
         }
     }
 
-    private static void generateSummaryReport(List<TestCase> testCases, String filePath) {
+    private static void generateSummaryReport(List<TestCase> testCases, String filePath,
+                                              String buildNumber, String branchName) {
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             Styles s = new Styles(wb);
             XSSFSheet metrics = wb.createSheet("Execution Metrics");
-            writeMetricsSheet(metrics, testCases, s, wb);
+            writeMetricsSheet(metrics, testCases, s, wb, buildNumber, branchName);
             XSSFSheet passRate = wb.createSheet("Pass Rate Summary");
             writePassRateSheet(passRate, testCases, s);
             saveWorkbook(wb, filePath);
@@ -136,7 +145,8 @@ public class ExcelReportGenerator {
         autoSize(sheet, headers.length);
     }
 
-    private static void writeMetricsSheet(XSSFSheet sheet, List<TestCase> testCases, Styles s, Workbook wb) {
+    private static void writeMetricsSheet(XSSFSheet sheet, List<TestCase> testCases, Styles s, Workbook wb,
+                                          String buildNumber, String branchName) {
         int total = testCases.size();
         long passed = testCases.stream().filter(tc -> "PASSED".equalsIgnoreCase(tc.getStatus())).count();
         long failed = testCases.stream().filter(tc -> "FAILED".equalsIgnoreCase(tc.getStatus())).count();
@@ -154,7 +164,7 @@ public class ExcelReportGenerator {
         // Sub-title
         Row sub = sheet.createRow(1);
         sub.createCell(0).setCellValue("Generated: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
-                + " | Build: " + BaseTest.buildNumber + " | Branch: " + BaseTest.branchName);
+                + " | Build: " + buildNumber + " | Branch: " + branchName);
 
         sheet.createRow(2); // spacer
 
@@ -264,9 +274,8 @@ public class ExcelReportGenerator {
         private CellStyle makeStyle(Workbook wb, byte[] rgb, IndexedColors fg, boolean bold, int size) {
             XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
             XSSFColor color = new XSSFColor(rgb, null);
-            style.setFillForegroundColorColor(color);
-            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            style.setAlignment(HorizontalAlignment.CENTER);
+            style.setFillForegroundColor(color);
+            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);            style.setAlignment(HorizontalAlignment.CENTER);
             style.setBorderBottom(BorderStyle.THIN); style.setBorderTop(BorderStyle.THIN);
             style.setBorderLeft(BorderStyle.THIN);   style.setBorderRight(BorderStyle.THIN);
             Font font = wb.createFont();

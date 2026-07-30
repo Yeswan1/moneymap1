@@ -1,6 +1,7 @@
 package com.example.moneymap.automation.pages;
 
 import com.example.moneymap.automation.utils.LogUtil;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -122,7 +123,7 @@ public class BasePage {
 
     protected void scrollToText(String text) {
         try {
-            driver.findElement(By.androidUIAutomator(
+            driver.findElement(AppiumBy.androidUIAutomator(
                     "new UiScrollable(new UiSelector().scrollable(true))" +
                             ".scrollIntoView(new UiSelector().textContains(\"" + text + "\"))"));
         } catch (Exception e) {
@@ -132,8 +133,7 @@ public class BasePage {
 
     protected void swipeUp() {
         try {
-            // UIAutomator2 scroll up via Android scrollable
-            driver.findElement(By.androidUIAutomator(
+            driver.findElement(AppiumBy.androidUIAutomator(
                     "new UiScrollable(new UiSelector().scrollable(true)).scrollBackward()"));
         } catch (Exception ignored) {}
     }

@@ -1,7 +1,6 @@
 package com.example.moneymap.automation.reporting;
 
 import com.example.moneymap.automation.model.TestCase;
-import com.example.moneymap.automation.tests.BaseTest;
 import com.example.moneymap.automation.utils.LogUtil;
 
 import java.io.File;
@@ -12,17 +11,25 @@ import java.util.*;
 /**
  * HTMLReportGenerator - Generates execution-report.html, dashboard.html, trends.html.
  * Features: dark theme, Chart.js visualizations, per-test detail rows with screenshots.
+ *
+ * NOTE: Does NOT import BaseTest — build/branch info passed as parameters to avoid
+ * src/main importing from src/test (Maven source set violation).
  */
 public class HTMLReportGenerator {
 
     public static void generateReports(List<TestCase> testCases, String outputDirectory) {
+        generateReports(testCases, outputDirectory, "local", "main", "local");
+    }
+
+    public static void generateReports(List<TestCase> testCases, String outputDirectory,
+                                       String buildNumber, String branchName, String gitCommit) {
         new File(outputDirectory).mkdirs();
 
         // ── Compute metrics ────────────────────────────────────────────────────
         int total = testCases.size();
         int passed = 0, failed = 0, skipped = 0;
         long totalDuration = 0;
-        Map<String, int[]> moduleStats = new LinkedHashMap<>(); // module → [total, passed, failed, skipped]
+        Map<String, int[]> moduleStats = new LinkedHashMap<>();
 
         for (TestCase tc : testCases) {
             totalDuration += tc.getDurationMs();
@@ -37,21 +44,18 @@ public class HTMLReportGenerator {
         int executed = passed + failed;
         double passRate = total > 0 ? (double) passed / total * 100 : 0.0;
         String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        String buildNum = BaseTest.buildNumber;
-        String branch   = BaseTest.branchName;
-        String commit   = BaseTest.gitCommit.length() > 8
-                          ? BaseTest.gitCommit.substring(0, 8) : BaseTest.gitCommit;
+        String commit  = gitCommit.length() > 8 ? gitCommit.substring(0, 8) : gitCommit;
 
         writeFile(outputDirectory + "/execution-report.html",
                 buildExecutionReport(testCases, total, executed, passed, failed, skipped,
-                        passRate, totalDuration, dateStr, buildNum, branch, commit, moduleStats));
+                        passRate, totalDuration, dateStr, buildNumber, branchName, commit, moduleStats));
 
         writeFile(outputDirectory + "/dashboard.html",
                 buildDashboard(total, passed, failed, skipped, passRate, totalDuration,
-                        dateStr, buildNum, branch, commit, moduleStats));
+                        dateStr, buildNumber, branchName, commit, moduleStats));
 
         writeFile(outputDirectory + "/trends.html",
-                buildTrendsPage(total, passed, failed, skipped, dateStr));
+                buildTrendsPage(total, passed, failed, skipped, dateStr, buildNumber));
 
         LogUtil.log("HTML reports generated in: " + outputDirectory);
     }
@@ -234,11 +238,11 @@ public class HTMLReportGenerator {
     //  trends.html
     // ─────────────────────────────────────────────────────────────────────────
 
-    private static String buildTrendsPage(int total, int passed, int failed, int skipped, String dateStr) {
+    private static String buildTrendsPage(int total, int passed, int failed, int skipped,
+                                           String dateStr, String buildNumber) {
         double passRate = total > 0 ? (double) passed / total * 100 : 0.0;
-        String buildNum = BaseTest.buildNumber;
         int runNum;
-        try { runNum = Integer.parseInt(buildNum); } catch (NumberFormatException e) { runNum = 1; }
+        try { runNum = Integer.parseInt(buildNumber); } catch (NumberFormatException e) { runNum = 1; }
 
         // Simulate trend history with declining/improving pattern
         String[] builds = {"Build-" + Math.max(1, runNum-4), "Build-" + Math.max(1, runNum-3),
@@ -257,7 +261,7 @@ public class HTMLReportGenerator {
         return CSS_VARS + HEAD_OPEN + "MoneyMap Trends" + HEAD_CLOSE + BODY_OPEN +
             "<div class='container'>" +
             "<div class='header'><h1>📈 Historical Pass Rate Trends</h1>" +
-            "<p class='meta'>Build #" + buildNum + " · Generated: " + dateStr + "</p></div>" +
+            "<p class='meta'>Build #" + buildNumber + " · Generated: " + dateStr + "</p></div>" +
             "<div class='card'><div class='chart-box' style='height:400px'><canvas id='trendsChart'></canvas></div></div>" +
             "<div class='metrics-grid' style='margin-top:24px'>" +
             metricCard("Current Pass Rate", String.format("%.2f%%", passRate), passRate >= 95 ? "val-green" : "val-red") +
