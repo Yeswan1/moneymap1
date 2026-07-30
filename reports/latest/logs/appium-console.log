@@ -6,7 +6,7 @@
 [38;5;112m[Appium][0m Appium REST http interface listener started on http://0.0.0.0:4723
 [38;5;112m[Appium][0m You can provide the following URLs in your client code to connect to this server:
 	http://127.0.0.1:4723/ (only accessible from the same host)
-	http://10.1.0.212:4723/
+	http://10.1.0.147:4723/
 	http://172.18.0.1:4723/
 [38;5;112m[Appium][0m Available drivers:
 [38;5;112m[Appium][0m   - uiautomator2@5.0.0 (automationName 'UiAutomator2')
