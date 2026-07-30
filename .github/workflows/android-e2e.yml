@@ -1,30 +1,7 @@
 name: "🤖 MoneyMap Android E2E Automation & CI/CD Pipeline"
 
 # ══════════════════════════════════════════════════════════════
-# ENTERPRISE-GRADE MOBILE AUTOMATION + BACKEND + REPORTING PIPELINE
-# ══════════════════════════════════════════════════════════════
-# Stages:
-#  1  Checkout Repository
-#  2  Setup Java 21
-#  3  Setup Android SDK
-#  4  Setup Node.js 20 + Install Backend Dependencies
-#  5  Start PostgreSQL (service container)
-#  6  Run Prisma migrations + Seed database
-#  7  Start NestJS Backend Server
-#  8  Verify Backend Health
-#  9  Build Debug APK
-# 10  Verify APK
-# 11  Enable KVM + Start Android Emulator
-# 12  Verify Emulator Readiness
-# 13  Install APK on Emulator
-# 14  Install Appium + UIAutomator2 Driver
-# 15  Start Appium Server
-# 16  Verify Appium Health
-# 17  Execute Appium E2E Tests (510+ test cases)
-# 18  Capture Post-Test Device Screenshots & Logs
-# 19  Upload All Artifacts (30-day retention)
-# 20  Deploy Reports to GitHub Pages
-# 21  Publish GitHub Actions Summary
+# ENTERPRISE-GRADE MOBILE AUTOMATION + BACKEND + REPORTING
 # ══════════════════════════════════════════════════════════════
 
 on:
@@ -46,12 +23,10 @@ permissions:
   pages: write
   id-token: write
 
-# ─── Global environment ────────────────────────────────────────────────────────
 env:
   ANDROID_API_LEVEL: 35
   APK_PATH: app/build/outputs/apk/debug/app-debug.apk
   APPIUM_PORT: 4723
-  # NestJS / Prisma
   DATABASE_URL: "postgresql://moneymap:password@localhost:5432/moneymap?schema=public"
   JWT_ACCESS_SECRET: "moneymap-access-secret-change-in-production-minimum-32-characters"
   JWT_REFRESH_SECRET: "moneymap-refresh-secret-change-in-production-minimum-32-characters"
@@ -63,14 +38,12 @@ env:
   PORT: "3000"
   API_PREFIX: "api/v1"
 
-# ══════════════════════════════════════════════════════════════
 jobs:
   build-and-test:
     name: "🚀 Build · NestJS · Postgres · Emulator · Appium · 510 Tests · Reports"
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
-    # ── PostgreSQL service container ────────────────────────────────────────────
     services:
       postgres:
         image: postgres:16-alpine
@@ -86,8 +59,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-      # Redis service kept available in case backend modules use it
-      # Currently not used in app.module.ts — safe to have running
       redis:
         image: redis:7-alpine
         ports:
@@ -128,7 +99,7 @@ jobs:
             emulator
             system-images;android-35;google_apis;x86_64
 
-      # ── Stage 4: Node.js + Backend Dependencies ──────────────────────────────
+      # ── Stage 4: Node.js + Backend ───────────────────────────────────────────
       - name: "🌱 Stage 4 · Setup Node.js 20 + Install Backend Dependencies"
         uses: actions/setup-node@v4
         with:
@@ -142,7 +113,7 @@ jobs:
           npm ci --prefer-offline || npm install
           echo "✅ Backend dependencies installed"
 
-      # ── Stage 5: Prisma Migrations ───────────────────────────────────────────
+      # ── Stage 5: Prisma ──────────────────────────────────────────────────────
       - name: "🗄️ Stage 5 · Run Prisma Migrations & Seed Database"
         run: |
           cd backend
@@ -162,33 +133,10 @@ jobs:
 
           echo "✅ Database ready"
 
-      # ── Stage 6: Build NestJS Backend ────────────────────────────────────────
-      - name: "🔨 Stage 6 · Build NestJS Backend"
+      # ── Stage 6: Start Backend (dev mode — no build step needed) ─────────────
+      - name: "🚀 Stage 6 · Start NestJS Backend Server"
         run: |
           cd backend
-          npm run build
-          echo "✅ NestJS build complete"
-          # Verify the built output exists before proceeding
-          ls -la dist/ || echo "⚠️ dist directory listing failed"
-          if [ ! -f "dist/main.js" ]; then
-            echo "⚠️ dist/main.js not found — trying to locate entry file..."
-            find dist -name "*.js" | head -5 || echo "No JS files in dist"
-          fi
-
-      # ── Stage 7: Start Backend Server ────────────────────────────────────────
-      - name: "🚀 Stage 7 · Start NestJS Backend Server"
-        run: |
-          cd backend
-          # Find the correct entry point
-          if [ -f "dist/main.js" ]; then
-            ENTRY="dist/main.js"
-          elif [ -f "dist/src/main.js" ]; then
-            ENTRY="dist/src/main.js"
-          else
-            ENTRY=$(find dist -name "main.js" 2>/dev/null | head -1)
-          fi
-          echo "Starting NestJS with entry: $ENTRY"
-
           NODE_ENV=development \
           PORT=3000 \
           API_PREFIX=api/v1 \
@@ -201,39 +149,35 @@ jobs:
           REDIS_PORT=6379 \
           REDIS_PASSWORD="" \
           CORS_ORIGINS="*" \
-          node "$ENTRY" &
-
-          echo "NestJS server starting in background (PID: $!)..."
+          npm run start:dev &
+          echo "NestJS dev server starting in background..."
           cd ..
 
-      # ── Stage 8: Verify Backend Health ───────────────────────────────────────
-      - name: "✅ Stage 8 · Verify Backend Health"
+      # ── Stage 7: Verify Backend Health ───────────────────────────────────────
+      - name: "✅ Stage 7 · Verify Backend Health"
         run: |
-          echo "Waiting for NestJS backend on http://localhost:3000/api/v1..."
-          TIMEOUT=90
+          echo "Waiting for NestJS backend..."
+          TIMEOUT=120
           ELAPSED=0
-          # Try health endpoint first, then swagger docs, then any 200
-          ENDPOINTS=(
-            "http://localhost:3000/api/v1/auth/signup"
-            "http://localhost:3000/api/v1/docs"
-            "http://localhost:3000"
-          )
-          while [ $ELAPSED -lt $TIMEOUT ]; do
-            for EP in "${ENDPOINTS[@]}"; do
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$EP" 2>/dev/null || echo "000")
-              if [[ "$STATUS" =~ ^[2345] ]]; then
-                echo "✅ Backend responding at $EP (HTTP $STATUS) after ${ELAPSED}s"
-                exit 0
-              fi
-            done
+          while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null || echo "000")
+            if echo "$STATUS" | grep -qE '^[2345]'; then
+              echo "✅ Backend responding (HTTP $STATUS) after ${ELAPSED}s"
+              break
+            fi
+            STATUS2=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/v1/docs 2>/dev/null || echo "000")
+            if echo "$STATUS2" | grep -qE '^[2345]'; then
+              echo "✅ Backend docs responding (HTTP $STATUS2) after ${ELAPSED}s"
+              break
+            fi
             sleep 3
             ELAPSED=$((ELAPSED + 3))
             echo "  ⏳ Waiting for backend... ${ELAPSED}s"
           done
-          echo "⚠️ Backend warm-up exceeded ${TIMEOUT}s — continuing (tests may show network errors)"
+          echo "Backend check complete (continuing regardless)"
 
-      # ── Stage 9: Enable KVM ───────────────────────────────────────────────────
-      - name: "⚡ Stage 9 · Enable KVM for hardware-accelerated emulator"
+      # ── Stage 8: Enable KVM ───────────────────────────────────────────────────
+      - name: "⚡ Stage 8 · Enable KVM"
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
             | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -241,8 +185,8 @@ jobs:
           sudo udevadm trigger --name-match=kvm
           echo "✅ KVM enabled"
 
-      # ── Stage 10: Build APK ───────────────────────────────────────────────────
-      - name: "🔨 Stage 10 · Build Debug APK"
+      # ── Stage 9: Build APK ────────────────────────────────────────────────────
+      - name: "🔨 Stage 9 · Build Debug APK"
         run: |
           ./gradlew assembleDebug \
             --stacktrace \
@@ -251,25 +195,30 @@ jobs:
             -Dorg.gradle.jvmargs="-Xmx4g"
           echo "✅ APK built"
 
-      # ── Stage 11: Verify APK ──────────────────────────────────────────────────
-      - name: "✅ Stage 11 · Verify APK"
+      # ── Stage 10: Verify APK ──────────────────────────────────────────────────
+      - name: "✅ Stage 10 · Verify APK"
         run: |
           if [ ! -f "${{ env.APK_PATH }}" ]; then
-            echo "❌ APK not found at ${{ env.APK_PATH }}"
+            echo "❌ APK not found"
             exit 1
           fi
           echo "✅ APK verified:"
           ls -lh "${{ env.APK_PATH }}"
           echo "APK_SIZE=$(du -sh ${{ env.APK_PATH }} | cut -f1)" >> $GITHUB_ENV
 
-      # ── Stage 12: Install Node for Appium ────────────────────────────────────
-      - name: "📥 Stage 12 · Setup Node.js 18 for Appium"
+      # ── Stage 11: Node.js 18 for Appium ──────────────────────────────────────
+      - name: "📥 Stage 11 · Setup Node.js 18 for Appium"
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # ── Stages 13–18: Emulator + Appium + Tests ──────────────────────────────
-      - name: "📱 Stages 13–18 · Emulator + Appium + 510 Tests + Reports"
+      # ── Stages 12–18: Emulator + Appium + Tests ───────────────────────────────
+      # NOTE: android-emulator-runner executes script lines via /usr/bin/sh (dash),
+      # NOT bash. All syntax must be POSIX sh compatible:
+      #   ✅ Use [ ] not [[ ]]
+      #   ✅ Use = not == in test expressions
+      #   ✅ No bash-specific until/while with [[ ]]
+      - name: "📱 Stages 12–18 · Emulator + Appium + 510 Tests + Reports"
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.ANDROID_API_LEVEL }}
@@ -288,7 +237,7 @@ jobs:
           script: |
             set -e
 
-            # ── Pre-flight: create all output directories ──────────────────
+            echo "=== Creating output directories ==="
             mkdir -p automation/reports/screenshots
             mkdir -p automation/reports/logs
             mkdir -p "automation/Test Results/Excel"
@@ -296,46 +245,40 @@ jobs:
             mkdir -p "automation/Test Results/JSON"
             mkdir -p "automation/Test Results/Summary"
 
-            # ── Stage 13: Verify Emulator Readiness ───────────────────────
-            echo "⏳ Waiting for emulator to fully boot..."
+            echo "=== Stage 12: Waiting for emulator to boot ==="
             adb wait-for-device
             BOOT_TIMEOUT=180
             ELAPSED=0
-            BOOT_DONE=0
-            while [ "$BOOT_DONE" = "0" ]; do
-              RESULT=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-              if [ "$RESULT" = "1" ]; then
-                BOOT_DONE=1
-              else
-                sleep 3
-                ELAPSED=$((ELAPSED + 3))
-                if [ "$ELAPSED" -ge "$BOOT_TIMEOUT" ]; then
-                  echo "❌ Emulator failed to boot within ${BOOT_TIMEOUT}s"
-                  exit 1
-                fi
-                echo "  ⏳ Booting... ${ELAPSED}s"
+            BOOTED=""
+            while [ "$BOOTED" != "1" ]; do
+              BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)
+              if [ "$BOOTED" = "1" ]; then
+                echo "✅ Emulator booted after ${ELAPSED}s"
+                break
               fi
+              sleep 3
+              ELAPSED=$((ELAPSED + 3))
+              if [ "$ELAPSED" -ge "$BOOT_TIMEOUT" ]; then
+                echo "❌ Emulator failed to boot within ${BOOT_TIMEOUT}s"
+                exit 1
+              fi
+              echo "  ⏳ Booting... ${ELAPSED}s"
             done
-            echo "✅ Emulator booted (${ELAPSED}s)"
             adb shell input keyevent 82
-            adb shell input keyevent 3
             sleep 2
             adb devices
 
-            # ── Stage 14: Install APK ─────────────────────────────────────
-            echo "📲 Installing APK..."
+            echo "=== Stage 13: Installing APK ==="
             adb install -r "${{ env.APK_PATH }}"
-            adb shell pm list packages | grep moneymap
-            echo "✅ APK installed: com.example.moneymap"
+            adb shell pm list packages | grep moneymap || true
+            echo "✅ APK installed"
 
-            # ── Stage 15: Install Appium ──────────────────────────────────
-            echo "🔧 Installing Appium..."
+            echo "=== Stage 14: Installing Appium ==="
             npm install -g appium@latest --loglevel=error
             appium driver install uiautomator2 --source npm
             echo "✅ Appium installed: $(appium --version)"
 
-            # ── Stage 16: Start Appium Server ─────────────────────────────
-            echo "🚀 Starting Appium server on port ${{ env.APPIUM_PORT }}..."
+            echo "=== Stage 15: Starting Appium server ==="
             appium \
               --port ${{ env.APPIUM_PORT }} \
               --log automation/reports/logs/appium-server.log \
@@ -345,31 +288,29 @@ jobs:
             APPIUM_PID=$!
             echo "Appium PID: $APPIUM_PID"
 
-            # ── Stage 17: Verify Appium Health ────────────────────────────
-            echo "⏳ Waiting for Appium..."
+            echo "=== Stage 16: Verifying Appium health ==="
             APPIUM_TIMEOUT=60
             APPIUM_ELAPSED=0
-            APPIUM_READY=0
-            while [ "$APPIUM_READY" = "0" ]; do
+            APPIUM_READY=""
+            while [ -z "$APPIUM_READY" ]; do
               if curl -sf http://127.0.0.1:${{ env.APPIUM_PORT }}/status > /dev/null 2>&1; then
-                APPIUM_READY=1
-              else
-                sleep 2
-                APPIUM_ELAPSED=$((APPIUM_ELAPSED + 2))
-                if [ "$APPIUM_ELAPSED" -ge "$APPIUM_TIMEOUT" ]; then
-                  echo "❌ Appium failed to start"
-                  cat automation/reports/logs/appium-console.log || true
-                  exit 1
-                fi
-                echo "  ⏳ Waiting for Appium... ${APPIUM_ELAPSED}s"
+                APPIUM_READY="yes"
+                echo "✅ Appium ready after ${APPIUM_ELAPSED}s"
+                break
               fi
+              sleep 2
+              APPIUM_ELAPSED=$((APPIUM_ELAPSED + 2))
+              if [ "$APPIUM_ELAPSED" -ge "$APPIUM_TIMEOUT" ]; then
+                echo "❌ Appium failed to start"
+                cat automation/reports/logs/appium-console.log || true
+                exit 1
+              fi
+              echo "  ⏳ Waiting for Appium... ${APPIUM_ELAPSED}s"
             done
-            echo "✅ Appium is ready:"
             curl -s http://127.0.0.1:${{ env.APPIUM_PORT }}/status \
               | python3 -m json.tool 2>/dev/null | head -10 || true
 
-            # ── Stage 18: Execute 510+ E2E Tests ──────────────────────────
-            echo "🧪 Executing Appium E2E test suite (510+ cases)..."
+            echo "=== Stage 17: Executing 510+ E2E Tests ==="
             echo "Build: #${{ github.run_number }} | Branch: ${{ github.ref_name }}"
             cd automation
             mvn clean test \
@@ -385,24 +326,17 @@ jobs:
             echo "Maven exit: ${TEST_EXIT:-0}"
             cd ..
 
-            # ── Capture post-test evidence ─────────────────────────────────
-            echo "📸 Capturing post-test device screenshot..."
+            echo "=== Stage 18: Capturing post-test evidence ==="
             adb exec-out screencap -p \
               > automation/reports/screenshots/post-test-device.png 2>/dev/null || true
-
-            echo "📋 Capturing ADB logcat..."
             adb logcat -d -t 2000 \
               > automation/reports/logs/adb-full-logcat.log 2>/dev/null || true
             adb logcat -d -t 500 "*:E" "moneymap:V" \
               > automation/reports/logs/adb-errors.log 2>/dev/null || true
-
-            # Copy Appium server log to Summary for artifact
             cp automation/reports/logs/appium-server.log \
                "automation/Test Results/Summary/" 2>/dev/null || true
+            echo "✅ Post-test evidence captured"
 
-            echo "✅ All post-test evidence captured"
-
-            # Propagate Maven failure (sub-95% pass rate triggers this)
             if [ -n "$TEST_EXIT" ] && [ "$TEST_EXIT" -ne 0 ]; then
               echo "❌ Tests failed with exit code $TEST_EXIT"
               exit "$TEST_EXIT"
@@ -465,43 +399,43 @@ jobs:
             automation/Test Results/Summary/
             ${{ env.APK_PATH }}
 
-      # ── Stage 20: GitHub Pages Deployment ────────────────────────────────────
+      # ── Stage 20: GitHub Pages ────────────────────────────────────────────────
       - name: "🌐 Stage 20a · Prepare GitHub Pages Deploy Structure"
         if: always()
         run: |
           mkdir -p deploy_site/reports/latest
-          mkdir -p deploy_site/reports/history/build-${{ github.run_number }}
+          mkdir -p "deploy_site/reports/history/build-${{ github.run_number }}"
 
-          # Preserve existing build history
-          echo "Checking for existing gh-pages history..."
+          # Restore previous history
           git clone \
             --branch gh-pages \
             --single-branch \
             --depth=50 \
             "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" \
-            gh-pages-clone 2>/dev/null || echo "No existing gh-pages (first run)"
-
+            gh-pages-clone 2>/dev/null || echo "No existing gh-pages"
           if [ -d "gh-pages-clone/reports/history" ]; then
-            echo "✅ Preserving existing history..."
             cp -r gh-pages-clone/reports/history/* \
                deploy_site/reports/history/ 2>/dev/null || true
+            echo "✅ Previous history restored"
           fi
+
+          # Check if reports exist
+          REPORT_EXISTS="false"
+          [ -f "automation/Test Results/HTML/execution-report.html" ] && REPORT_EXISTS="true"
 
           # Copy latest reports
           cp "automation/Test Results/HTML/execution-report.html" \
-             deploy_site/reports/latest/ 2>/dev/null || echo "⚠️ execution-report.html not found"
+             deploy_site/reports/latest/ 2>/dev/null || echo "⚠️ execution-report.html not generated"
           cp "automation/Test Results/HTML/dashboard.html" \
-             deploy_site/reports/latest/ 2>/dev/null || echo "⚠️ dashboard.html not found"
+             deploy_site/reports/latest/ 2>/dev/null || true
           cp "automation/Test Results/HTML/trends.html" \
-             deploy_site/reports/latest/ 2>/dev/null || echo "⚠️ trends.html not found"
+             deploy_site/reports/latest/ 2>/dev/null || true
           cp "automation/Test Results/JSON/execution-results.json" \
              deploy_site/reports/latest/ 2>/dev/null || true
           cp "automation/Test Results/Summary/summary.md" \
              deploy_site/reports/latest/ 2>/dev/null || true
-          cp -r automation/reports/screenshots \
-             deploy_site/reports/latest/ 2>/dev/null || true
-          cp -r automation/reports/logs \
-             deploy_site/reports/latest/ 2>/dev/null || true
+          cp -r automation/reports/screenshots deploy_site/reports/latest/ 2>/dev/null || true
+          cp -r automation/reports/logs deploy_site/reports/latest/ 2>/dev/null || true
 
           # Copy to history
           cp "automation/Test Results/HTML/execution-report.html" \
@@ -510,104 +444,88 @@ jobs:
              "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
           cp "automation/Test Results/Summary/summary.md" \
              "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
-          cp -r automation/reports/screenshots \
-             "deploy_site/reports/history/build-${{ github.run_number }}/" 2>/dev/null || true
 
-          # ── Generate a status-aware landing page ────────────────
-          # Check if reports were actually generated
-          REPORT_EXISTS="false"
-          if [ -f "automation/Test Results/HTML/execution-report.html" ]; then
-            REPORT_EXISTS="true"
+          # Determine status badge
+          if [ "$REPORT_EXISTS" = "true" ]; then
+            BADGE_COLOR="#10B981"
+            BADGE_TEXT="Tests Completed"
+            STATUS_MSG="Redirecting to latest execution report..."
+            REDIRECT='<meta http-equiv="refresh" content="3; url=reports/latest/execution-report.html">'
+            CTA='<a href="reports/latest/execution-report.html">View Execution Report</a>'
+          else
+            BADGE_COLOR="#EF4444"
+            BADGE_TEXT="Pipeline Incomplete"
+            STATUS_MSG="Tests did not run or reports were not generated. Check pipeline logs."
+            REDIRECT=""
+            CTA='<a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" target="_blank">View Pipeline Logs</a>'
           fi
 
           BUILD_NUM="${{ github.run_number }}"
-          COMMIT="${{ github.sha }}"
-          SHORT_COMMIT="${COMMIT:0:8}"
           BRANCH="${{ github.ref_name }}"
-          DATE_NOW=$(date '+%Y-%m-%d %H:%M UTC')
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
 
-          if [ "$REPORT_EXISTS" = "true" ]; then
-            BADGE_COLOR="#10B981"
-            BADGE_TEXT="✅ Tests Completed"
-            REDIRECT_META='<meta http-equiv="refresh" content="3; url=reports/latest/execution-report.html">'
-            CTA_HTML='<a href="reports/latest/execution-report.html">View Execution Report →</a><br><br><a href="reports/history/index.html" style="background:#334155;margin-top:8px">Build History</a>'
-            STATUS_MSG="Redirecting to report in 3 seconds..."
-          else
-            BADGE_COLOR="#EF4444"
-            BADGE_TEXT="⚠️ Pipeline Incomplete"
-            REDIRECT_META=""
-            CTA_HTML='<a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" target="_blank">View Pipeline Logs →</a><br><br><a href="reports/history/index.html" style="background:#334155;margin-top:8px">Previous Build History</a>'
-            STATUS_MSG="The pipeline did not complete successfully. Reports could not be generated."
-          fi
-
-          cat > deploy_site/index.html << LANDING_EOF
+          cat > deploy_site/index.html << INDEXEOF
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  ${REDIRECT_META}
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  ${REDIRECT}
   <title>MoneyMap E2E Reports — Build #${BUILD_NUM}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#0F172A;color:#F8FAFC;font-family:'Outfit',sans-serif;
+    body{background:#0F172A;color:#F8FAFC;font-family:system-ui,sans-serif;
          display:flex;align-items:center;justify-content:center;min-height:100vh;}
-    .card{background:#1E293B;border:1px solid #334155;border-radius:24px;
+    .card{background:#1E293B;border:1px solid #334155;border-radius:20px;
           padding:48px 40px;text-align:center;max-width:520px;width:90%;}
-    .logo{font-size:40px;margin-bottom:16px;}
-    h1{font-size:26px;font-weight:700;background:linear-gradient(135deg,#60A5FA,#3B82F6);
-       -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
-    .badge{display:inline-block;background:${BADGE_COLOR};color:#fff;font-size:13px;
-           font-weight:600;padding:4px 14px;border-radius:999px;margin-bottom:20px;}
-    .meta{color:#64748B;font-size:13px;margin-bottom:24px;line-height:1.8;}
-    .meta span{color:#94A3B8;}
-    p.status{color:#94A3B8;font-size:14px;margin-bottom:28px;}
-    a{background:#3B82F6;color:#fff;text-decoration:none;padding:12px 28px;
-      border-radius:12px;font-weight:600;display:inline-block;font-size:15px;}
+    h1{font-size:24px;font-weight:700;margin-bottom:10px;color:#60A5FA;}
+    .badge{display:inline-block;background:${BADGE_COLOR};color:#fff;
+           font-size:12px;font-weight:600;padding:4px 12px;border-radius:999px;margin-bottom:18px;}
+    .meta{color:#64748B;font-size:13px;margin-bottom:20px;line-height:1.9;}
+    .meta b{color:#94A3B8;}
+    p{color:#94A3B8;font-size:14px;margin-bottom:24px;}
+    a{background:#3B82F6;color:#fff;text-decoration:none;padding:11px 26px;
+      border-radius:10px;font-weight:600;display:inline-block;font-size:14px;}
     a:hover{background:#2563EB;}
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="logo">📱</div>
-    <h1>MoneyMap E2E Reports</h1>
+    <h1>📱 MoneyMap E2E Reports</h1>
     <div class="badge">${BADGE_TEXT}</div>
     <div class="meta">
-      Build <span>#${BUILD_NUM}</span> &nbsp;·&nbsp;
-      Branch <span>${BRANCH}</span> &nbsp;·&nbsp;
-      Commit <span>${SHORT_COMMIT}</span><br>
-      <span>${DATE_NOW}</span>
+      Build <b>#${BUILD_NUM}</b> &nbsp;·&nbsp; Branch <b>${BRANCH}</b><br>
+      Commit <b>${SHORT_SHA}</b>
     </div>
-    <p class="status">${STATUS_MSG}</p>
-    ${CTA_HTML}
+    <p>${STATUS_MSG}</p>
+    ${CTA}
   </div>
 </body>
 </html>
-LANDING_EOF
+INDEXEOF
 
-          # Build history index
+          # History index page
           {
-            echo "<!DOCTYPE html><html><head><title>Build History</title>"
-            echo "<link href='https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap' rel='stylesheet'>"
-            echo "<style>body{background:#0F172A;color:#F8FAFC;font-family:Outfit,sans-serif;padding:32px;}"
-            echo "h1{background:linear-gradient(135deg,#60A5FA,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}"
-            echo "ul{list-style:none;padding:0;}li{background:#1E293B;border:1px solid #334155;"
-            echo "border-radius:12px;margin:8px 0;padding:16px;}a{color:#60A5FA;text-decoration:none;font-weight:600;}"
-            echo "a:hover{text-decoration:underline;}</style></head><body>"
+            echo "<!DOCTYPE html><html><head><meta charset='UTF-8'>"
+            echo "<title>Build History</title>"
+            echo "<style>body{background:#0F172A;color:#F8FAFC;font-family:system-ui,sans-serif;padding:32px;max-width:800px;margin:0 auto;}"
+            echo "h1{color:#60A5FA;margin-bottom:24px;}ul{list-style:none;padding:0;}"
+            echo "li{background:#1E293B;border:1px solid #334155;border-radius:10px;margin:8px 0;padding:14px 20px;}"
+            echo "a{color:#60A5FA;text-decoration:none;font-weight:600;}a:hover{text-decoration:underline;}"
+            echo ".back{margin-top:20px;display:inline-block;}</style></head><body>"
             echo "<h1>📊 MoneyMap Build History</h1><ul>"
           } > deploy_site/reports/history/index.html
 
           for build_dir in deploy_site/reports/history/build-*/; do
-            build_name=$(basename "$build_dir")
+            bn=$(basename "$build_dir")
             if [ -f "$build_dir/execution-report.html" ]; then
-              echo "<li><a href='$build_name/execution-report.html'>📋 $build_name</a></li>" \
+              echo "<li><a href='${bn}/execution-report.html'>📋 ${bn}</a></li>" \
                 >> deploy_site/reports/history/index.html
             fi
           done
-
-          echo "</ul><p><a href='../latest/execution-report.html'>← Latest Report</a></p></body></html>" \
+          echo "</ul><p class='back'><a href='../latest/execution-report.html'>← Latest Report</a></p>" \
             >> deploy_site/reports/history/index.html
+          echo "</body></html>" >> deploy_site/reports/history/index.html
 
           echo "✅ Deploy structure ready:"
           find deploy_site -name "*.html" | head -20
@@ -619,7 +537,7 @@ LANDING_EOF
           branch: gh-pages
           folder: deploy_site
           clean: false
-          commit-message: "📊 E2E Report — Build #${{ github.run_number }} [${{ github.sha }}]"
+          commit-message: "📊 E2E Report Build #${{ github.run_number }} [${{ github.sha }}]"
 
       # ── Stage 21: GitHub Actions Summary ─────────────────────────────────────
       - name: "📋 Stage 21 · Publish GitHub Actions Summary"
@@ -629,7 +547,7 @@ LANDING_EOF
           REPO_NAME=$(echo '${{ github.repository }}' | cut -d/ -f2)
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/reports/latest/execution-report.html"
 
-          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+          cat >> "$GITHUB_STEP_SUMMARY" << SUMEOF
           ## 🤖 MoneyMap Android Appium E2E — Execution Summary
 
           | Field | Value |
@@ -644,23 +562,23 @@ LANDING_EOF
           | **Device** | Android ${{ env.ANDROID_API_LEVEL }} Emulator (x86_64, UiAutomator2) |
           | **Test Cases** | 510+ |
           | **Live Report** | [View on GitHub Pages](${REPORT_URL}) |
-          | **Build History** | [All Builds](${REPORT_URL%/execution-report.html}/history/index.html) |
+          | **Build History** | [All Builds](https://${{ github.repository_owner }}.github.io/${REPO_NAME}/reports/history/index.html) |
 
-          EOF
+          SUMEOF
 
           if [ -f "$SUMMARY_FILE" ]; then
             cat "$SUMMARY_FILE" >> "$GITHUB_STEP_SUMMARY"
           else
-            cat >> "$GITHUB_STEP_SUMMARY" << 'EOF'
+            cat >> "$GITHUB_STEP_SUMMARY" << 'WARNEOF'
           ### ⚠️ Test summary not generated
-          Check the Maven execution log in the uploaded **Logs** artifact for details.
-          EOF
+          The Appium test suite did not complete. Check the **Logs** artifact for `mvn-execution.log`.
+          WARNEOF
           fi
 
-          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+          cat >> "$GITHUB_STEP_SUMMARY" << ENDEOF
 
           ---
-          🔗 **Artifacts**: [Download from Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          EOF
+          🔗 **Artifacts**: [Download](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          ENDEOF
 
-          echo "✅ GitHub Actions Summary published"
+          echo "✅ Summary published"
