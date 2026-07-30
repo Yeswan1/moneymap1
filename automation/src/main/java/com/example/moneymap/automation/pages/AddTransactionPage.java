@@ -10,23 +10,20 @@ import org.openqa.selenium.By;
 public class AddTransactionPage extends BasePage {
 
     private final By expenseToggle = By.xpath(
-            "//*[@text='EXPENSE' or @content-desc='EXPENSE']");
+            "//*[@text='Expense' or @text='EXPENSE' or @content-desc='Expense']");
     private final By incomeToggle = By.xpath(
-            "//*[@text='INCOME' or @content-desc='INCOME']");
+            "//*[@text='Income' or @text='INCOME' or @content-desc='Income']");
     private final By amountDisplay = By.xpath(
-            "//*[@resource-id='com.example.moneymap:id/amount_text']");
+            "//*[contains(@resource-id, 'amount') or contains(@text, '0.00')]");
     private final By saveButton = By.xpath(
-            "//*[@resource-id='com.example.moneymap:id/btn_save' " +
-            "or @text='Save Transaction' or @content-desc='Save Transaction']");
+            "//*[@text='Add Expense' or @text='Add Income' or @text='Save Transaction' or contains(@text, 'Save') or contains(@text, 'Add')]");
     private final By noteField = By.xpath(
-            "//*[@resource-id='com.example.moneymap:id/et_note' " +
-            "or @hint='Add a note...' or @text='Add a note...']");
+            "//android.widget.EditText[@text='What did you buy?' or @hint='What did you buy?' or contains(@resource-id, 'description') or contains(@resource-id, 'note') or contains(@resource-id, 'et_note')]");
     private final By backspaceButton = By.id("com.example.moneymap:id/btn_backspace");
     private final By closeButton = By.xpath(
-            "//*[@resource-id='com.example.moneymap:id/btn_close' " +
-            "or @content-desc='Close']");
-    private final By dateContainer = By.id("com.example.moneymap:id/date_container");
-    private final By categoryGrid = By.id("com.example.moneymap:id/category_grid");
+            "//*[@content-desc='Close' or @content-desc='Back' or contains(@content-desc, 'Back') or contains(@text, 'Back')]");
+    private final By dateContainer = By.xpath("//*[contains(@resource-id, 'date') or contains(@text, '-')]");
+    private final By categoryGrid = By.xpath("//*[contains(@resource-id, 'category')]");
 
     public AddTransactionPage(AndroidDriver driver) {
         super(driver);
@@ -45,17 +42,20 @@ public class AddTransactionPage extends BasePage {
      * Parses the amount string and taps each digit/dot on the keypad grid.
      */
     public void enterAmount(String amount) {
-        // First clear by tapping backspace multiple times
-        for (int i = 0; i < 10; i++) {
-            try { click(backspaceButton); } catch (Exception ignored) { break; }
-        }
-        // Tap each character on the keypad
-        for (char c : amount.toCharArray()) {
-            if (c == '-') continue; // Keypad doesn't support minus
-            String charStr = String.valueOf(c);
-            try {
-                click(By.xpath("//*[@text='" + charStr + "' and contains(@class,'TextView')]"));
-            } catch (Exception ignored) {}
+        By amountField = By.xpath("//android.widget.EditText[@text='0.00' or @hint='0.00' or contains(@text, '0.00') or contains(@resource-id, 'amount') or contains(@resource-id, 'et_amount')]");
+        try {
+            clearAndType(amountField, amount);
+        } catch (Exception e) {
+            // Keypad fallback
+            for (int i = 0; i < 10; i++) {
+                try { click(backspaceButton); } catch (Exception ignored) { break; }
+            }
+            for (char c : amount.toCharArray()) {
+                String charStr = String.valueOf(c);
+                try {
+                    click(By.xpath("//*[@text='" + charStr + "' and contains(@class,'TextView')]"));
+                } catch (Exception ignored) {}
+            }
         }
     }
 
@@ -70,21 +70,15 @@ public class AddTransactionPage extends BasePage {
     }
 
     public void enterNote(String note) {
-        try {
-            clearAndType(noteField, note);
-        } catch (Exception e) {
-            By noteFallback = By.xpath("//android.widget.EditText[contains(@hint,'note') or contains(@text,'note')]");
-            clearAndType(noteFallback, note);
-        }
+        clearAndType(noteField, note);
     }
 
     public void clickSave() {
-        scrollToText("Save Transaction");
         click(saveButton);
     }
 
     public void clickClose() {
-        try { click(closeButton); } catch (Exception e) { pressBack(); }
+        click(closeButton);
     }
 
     public void tapDateField() {

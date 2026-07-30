@@ -91,10 +91,29 @@ public class HTMLReportGenerator {
                 rows.append("<p><strong>Steps:</strong><br>").append(esc(tc.getSteps()).replace("\n","<br>")).append("</p>");
                 rows.append("<p><strong>Expected:</strong> ").append(esc(tc.getExpectedResult())).append("</p>");
                 rows.append("<p class='error-msg'><strong>Reason:</strong> ").append(esc(tc.getActualResult())).append("</p>");
+
+                // Add diagnostics metadata
+                rows.append("<div class='diagnostics-metadata' style='margin-top: 10px; padding: 10px; background-color: #1e293b; border-radius: 6px; color: #cbd5e1;'>");
+                rows.append("<p style='margin: 4px 0;'><strong>Current Package:</strong> ").append(esc(tc.getCurrentPackage().isEmpty() ? "N/A" : tc.getCurrentPackage())).append("</p>");
+                rows.append("<p style='margin: 4px 0;'><strong>Current Activity:</strong> ").append(esc(tc.getCurrentActivity().isEmpty() ? "N/A" : tc.getCurrentActivity())).append("</p>");
+                rows.append("<p style='margin: 4px 0;'><strong>Locator Used:</strong> <code style='background-color: #334155; padding: 2px 4px; border-radius: 4px;'>").append(esc(tc.getLocatorUsed().isEmpty() ? "N/A" : tc.getLocatorUsed())).append("</code></p>");
+
+                rows.append("<p style='margin: 10px 0 0 0;'><strong>Diagnostic Links:</strong> ");
+                if (tc.getDeviceLogPath() != null && !tc.getDeviceLogPath().isEmpty()) {
+                    rows.append("<a href='../").append(esc(tc.getDeviceLogPath())).append("' target='_blank' style='color: #38bdf8; text-decoration: underline; margin-right: 15px;'>Device Logcat</a>");
+                }
+                if (tc.getAppiumLogPath() != null && !tc.getAppiumLogPath().isEmpty()) {
+                    rows.append("<a href='../").append(esc(tc.getAppiumLogPath())).append("' target='_blank' style='color: #38bdf8; text-decoration: underline; margin-right: 15px;'>Appium Server Log</a>");
+                }
+                if (tc.getPageSourcePath() != null && !tc.getPageSourcePath().isEmpty()) {
+                    rows.append("<a href='../").append(esc(tc.getPageSourcePath())).append("' target='_blank' style='color: #38bdf8; text-decoration: underline;'>Page Source XML</a>");
+                }
+                rows.append("</p></div>");
+
                 if (tc.getScreenshotPath() != null && !tc.getScreenshotPath().isEmpty()) {
-                    rows.append("<div class='screenshot-wrap'>");
+                    rows.append("<div class='screenshot-wrap' style='margin-top: 15px;'>");
                     rows.append("<p class='small'>📸 Failure Screenshot:</p>");
-                    rows.append("<img src='../").append(esc(tc.getScreenshotPath())).append("' class='screenshot' alt='Failure Screenshot'/>");
+                    rows.append("<img src='../").append(esc(tc.getScreenshotPath())).append("' class='screenshot' style='max-width: 320px; border: 2px solid #475569; border-radius: 8px;' alt='Failure Screenshot'/>");
                     rows.append("</div>");
                 }
                 rows.append("</div></td></tr>\n");

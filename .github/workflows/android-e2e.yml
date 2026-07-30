@@ -1,16 +1,5 @@
 name: "MoneyMap Android E2E Automation and CI/CD Pipeline"
 
-# ============================================================
-# VERSION MATRIX (all pinned)
-#   Node.js       20.19  (Appium 3 requires >= 20.19.0)
-#   npm           10.9.2 (Appium 3 requires >= 10)
-#   Appium        3.0.0
-#   uiautomator2  5.0.0  (Appium 3 only)
-#   Java client   9.2.2  (W3C, works with Appium 3)
-#   Android API   35
-#   Postgres      16-alpine
-# ============================================================
-
 on:
   push:
     branches: [main, master]
@@ -46,10 +35,53 @@ env:
   API_PREFIX: "api/v1"
 
 jobs:
-  build-and-test:
-    name: "Build NestJS Postgres Emulator Appium 510 Tests Reports"
+  # ============================================================
+  # JOB 1: Build the Debug APK once
+  # ============================================================
+  build-apk:
+    name: "Build Debug APK"
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "Make Gradle wrapper executable"
+        run: chmod +x ./gradlew
+
+      - name: "Setup Java 21"
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: "Build Debug APK"
+        run: |
+          ./gradlew assembleDebug \
+            --stacktrace \
+            --no-daemon \
+            -PMONEYMAP_API_BASE_URL="http://10.0.2.2:3000/api/v1/" \
+            -Dorg.gradle.jvmargs="-Xmx4g"
+
+      - name: "Verify and Upload APK"
+        uses: actions/upload-artifact@v4
+        with:
+          name: moneymap-debug-apk
+          path: ${{ env.APK_PATH }}
+          retention-days: 1
+
+  # ============================================================
+  # JOB 2: Run tests in parallel matrix shards
+  # ============================================================
+  run-tests:
+    name: "Shard: ${{ matrix.shard }}"
+    needs: build-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [auth, dashboard, transactions, budget, settings, reports]
 
     services:
       postgres:
@@ -77,26 +109,22 @@ jobs:
           --health-retries 5
 
     steps:
-
-      # ── Stage 1: Checkout ──────────────────────────────────
-      - name: "Stage 1 Checkout Repository"
+      - name: "Checkout Repository"
         uses: actions/checkout@v4
+
+      - name: "Download Built APK"
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
+          name: moneymap-debug-apk
+          path: app/build/outputs/apk/debug/
 
-      - name: "Make Gradle wrapper executable"
-        run: chmod +x ./gradlew
-
-      # ── Stage 2: Java 21 ───────────────────────────────────
-      - name: "Stage 2 Setup Java 21"
+      - name: "Setup Java 21"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
-          cache: gradle
 
-      # ── Stage 3: Android SDK ───────────────────────────────
-      - name: "Stage 3 Setup Android SDK"
+      - name: "Setup Android SDK"
         uses: android-actions/setup-android@v3
         with:
           packages: >
@@ -106,38 +134,27 @@ jobs:
             emulator
             system-images;android-35;google_apis;x86_64
 
-      # ── Stage 4: Node.js 20.19 for NestJS backend ─────────
-      # NOTE: This node version is also sufficient for Appium 3.
-      # Stage 11 re-activates the same version for the emulator job.
-      - name: "Stage 4 Setup Node.js 20.19"
+      - name: "Setup Node.js 20.19"
         uses: actions/setup-node@v4
         with:
           node-version: "20.19"
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      # ── Stage 4b: NestJS dependencies ─────────────────────
-      - name: "Stage 4b Install NestJS Backend Dependencies"
+      - name: "Install NestJS Backend Dependencies"
         run: |
           cd backend
           npm ci --prefer-offline || npm install
           echo "Backend dependencies installed"
 
-      # ── Stage 5: Prisma migrations + seed ─────────────────
-      - name: "Stage 5 Run Prisma Migrations and Seed Database"
+      - name: "Run Prisma Migrations and Seed"
         run: |
           cd backend
           npx prisma generate
-          npx prisma db push --skip-generate --accept-data-loss \
-            || npx prisma migrate deploy \
-            || echo "Migration warning — continuing"
-          npm run prisma:seed \
-            || npx ts-node prisma/seed.ts \
-            || echo "Seed warning — continuing"
-          echo "Database ready"
+          npx prisma db push --skip-generate --accept-data-loss || npx prisma migrate deploy
+          npm run prisma:seed || npx ts-node prisma/seed.ts || echo "Seed warning"
 
-      # ── Stage 6: Start NestJS backend (dev mode, no build) ─
-      - name: "Stage 6 Start NestJS Backend Server"
+      - name: "Start NestJS Backend"
         run: |
           cd backend
           NODE_ENV=development \
@@ -153,75 +170,34 @@ jobs:
           REDIS_PASSWORD="" \
           CORS_ORIGINS="*" \
           npm run start:dev > /tmp/nestjs.log 2>&1 &
-          echo "NestJS dev server starting in background (PID $!)"
+          echo "NestJS dev server starting in background"
           cd ..
 
-      # ── Stage 7: Wait for backend health ──────────────────
-      - name: "Stage 7 Verify Backend Health"
+      - name: "Verify Backend Health"
         run: |
           echo "Waiting for NestJS backend..."
           TIMEOUT=120
           ELAPSED=0
           while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
-            for EP in "http://localhost:3000" "http://localhost:3000/api/v1/docs"; do
-              CODE=$(curl -s -o /dev/null -w "%{http_code}" "$EP" 2>/dev/null || echo "000")
-              if echo "$CODE" | grep -qE "^[2345]"; then
-                echo "Backend healthy at $EP (HTTP $CODE) after ${ELAPSED}s"
-                exit 0
-              fi
-            done
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000" 2>/dev/null || echo "000")
+            if echo "$CODE" | grep -qE "^[2345]"; then
+              echo "Backend healthy (HTTP $CODE) after ${ELAPSED}s"
+              exit 0
+            fi
             sleep 3
             ELAPSED=$((ELAPSED + 3))
-            echo "  waiting... ${ELAPSED}s"
           done
-          echo "Backend did not respond in ${TIMEOUT}s — showing last 30 lines of log:"
-          tail -30 /tmp/nestjs.log || true
-          echo "Continuing anyway..."
+          echo "Backend did not respond in time"
+          exit 1
 
-      # ── Stage 8: Enable KVM for emulator ──────────────────
-      - name: "Stage 8 Enable KVM"
+      - name: "Enable KVM"
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
-            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
           echo "KVM enabled"
 
-      # ── Stage 9: Build debug APK ───────────────────────────
-      # -PMONEYMAP_API_BASE_URL is read by app/build.gradle.kts
-      # via: project.findProperty("MONEYMAP_API_BASE_URL")
-      # This overrides the default URL so the emulator can reach
-      # the host backend at 10.0.2.2:3000
-      - name: "Stage 9 Build Debug APK"
-        run: |
-          ./gradlew assembleDebug \
-            --stacktrace \
-            --no-daemon \
-            -PMONEYMAP_API_BASE_URL="http://10.0.2.2:3000/api/v1/" \
-            -Dorg.gradle.jvmargs="-Xmx4g"
-          echo "APK built"
-
-      # ── Stage 10: Verify APK exists ───────────────────────
-      - name: "Stage 10 Verify APK"
-        run: |
-          if [ ! -f "${{ env.APK_PATH }}" ]; then
-            echo "ERROR: APK not found at ${{ env.APK_PATH }}"
-            exit 1
-          fi
-          ls -lh "${{ env.APK_PATH }}"
-          echo "APK_SIZE=$(du -sh ${{ env.APK_PATH }} | cut -f1)" >> "$GITHUB_ENV"
-          echo "APK verified"
-
-      # ── Stage 11: Re-activate Node 20.19 for Appium ───────
-      # android-emulator-runner resets the environment, so we
-      # explicitly set node again before launching the runner.
-      - name: "Stage 11 Setup Node.js 20.19 for Appium 3"
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.19"
-
-      # ── Stages 12-18: Emulator + Appium + Tests ───────────
-      - name: "Stages 12-18 Emulator Appium 510 Tests Reports"
+      - name: "Execute Shard Emulator Tests"
         uses: reactivecircus/android-emulator-runner@v2
         env:
           APK_PATH: ${{ env.APK_PATH }}
@@ -230,83 +206,139 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
           ANDROID_API_LEVEL: ${{ env.ANDROID_API_LEVEL }}
+          TEST_SHARD: ${{ matrix.shard }}
         with:
           api-level: ${{ env.ANDROID_API_LEVEL }}
           target: google_apis
           arch: x86_64
           force-avd-creation: false
           disable-animations: true
-          emulator-options: >-
-            -no-window
-            -gpu swiftshader_indirect
-            -noaudio
-            -no-boot-anim
-            -camera-back none
-            -memory 2048
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 2048
           script: |
             chmod +x automation/.github-scripts/run-e2e-tests.sh
             automation/.github-scripts/run-e2e-tests.sh
 
-      # ── Stage 19a-f: Upload all artifacts ─────────────────
-      - name: "Stage 19a Upload Excel Reports"
+      - name: "Rename and Prepare Shard Artifacts"
+        if: always()
+        run: |
+          if [ -f "automation/Test Results/JSON/execution-results.json" ]; then
+            mv "automation/Test Results/JSON/execution-results.json" "automation/Test Results/JSON/execution-results-${{ matrix.shard }}.json"
+          fi
+          # Copy screenshots and logs under Test Results directory to upload them together
+          mkdir -p "automation/Test Results/screenshots"
+          mkdir -p "automation/Test Results/logs"
+          cp -r automation/reports/screenshots/* "automation/Test Results/screenshots/" 2>/dev/null || true
+          cp -r automation/reports/logs/* "automation/Test Results/logs/" 2>/dev/null || true
+
+      - name: "Upload Shard Results"
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: "MoneyMap-Excel-Reports-Build-${{ github.run_number }}"
-          retention-days: 30
-          if-no-files-found: warn
-          path: "automation/Test Results/Excel/"
+          name: shard-results-${{ matrix.shard }}
+          path: automation/Test Results/
+          retention-days: 1
 
-      - name: "Stage 19b Upload HTML Reports"
-        if: always()
+  # ============================================================
+  # JOB 3: Consolidate reports and publish
+  # ============================================================
+  consolidate-reports:
+    name: "Consolidate and Publish Reports"
+    needs: run-tests
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "Setup Java 21"
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: "Create report directories"
+        run: |
+          mkdir -p all-json
+          mkdir -p automation/reports/screenshots
+          mkdir -p automation/reports/logs
+          mkdir -p "automation/Test Results"
+
+      - name: "Download Shard Auth"
+        uses: actions/download-artifact@v4
+        with:
+          name: shard-results-auth
+          path: temp-auth
+        continue-on-error: true
+
+      - name: "Download Shard Dashboard"
+        uses: actions/download-artifact@v4
+        with:
+          name: shard-results-dashboard
+          path: temp-dashboard
+        continue-on-error: true
+
+      - name: "Download Shard Transactions"
+        uses: actions/download-artifact@v4
+        with:
+          name: shard-results-transactions
+          path: temp-transactions
+        continue-on-error: true
+
+      - name: "Download Shard Budget"
+        uses: actions/download-artifact@v4
+        with:
+          name: shard-results-budget
+          path: temp-budget
+        continue-on-error: true
+
+      - name: "Download Shard Settings"
+        uses: actions/download-artifact@v4
+        with:
+          name: shard-results-settings
+          path: temp-settings
+        continue-on-error: true
+
+      - name: "Download Shard Reports"
+        uses: actions/download-artifact@v4
+        with:
+          name: shard-results-reports
+          path: temp-reports
+        continue-on-error: true
+
+      - name: "Merge Shard Artifact Folders"
+        run: |
+          # Copy JSONs to all-json folder
+          find temp-* -name "execution-results-*.json" -exec cp {} all-json/ \; || true
+          
+          # Copy screenshots and logs to active report directories
+          find temp-* -path "*/screenshots/*" -exec cp -r {} automation/reports/ \; || true
+          find temp-* -path "*/logs/*" -exec cp -r {} automation/reports/ \; || true
+          
+          # Show what was collected
+          echo "JSON files to merge:"
+          ls -l all-json/ || true
+
+      - name: "Compile and Run ReportMerger"
+        run: |
+          cd automation
+          mvn compile exec:java \
+            -Dexec.mainClass="com.example.moneymap.automation.reporting.ReportMerger" \
+            -Dexec.args="../all-json ../automation/Test Results"
+
+      - name: "Zip Consolidate Reports"
+        run: |
+          zip -r reports.zip "automation/Test Results/"
+          echo "Merged reports packaged"
+
+      - name: "Upload Merged Reports Artifact"
         uses: actions/upload-artifact@v4
         with:
-          name: "MoneyMap-HTML-Reports-Build-${{ github.run_number }}"
+          name: "MoneyMap-Consolidated-Reports-Build-${{ github.run_number }}"
+          path: reports.zip
           retention-days: 30
-          if-no-files-found: warn
-          path: "automation/Test Results/HTML/"
+          if-no-files-found: error
 
-      - name: "Stage 19c Upload JSON Report"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: "MoneyMap-JSON-Report-Build-${{ github.run_number }}"
-          retention-days: 30
-          if-no-files-found: warn
-          path: "automation/Test Results/JSON/"
-
-      - name: "Stage 19d Upload Screenshots"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: "MoneyMap-Screenshots-Build-${{ github.run_number }}"
-          retention-days: 30
-          if-no-files-found: warn
-          path: "automation/reports/screenshots/"
-
-      - name: "Stage 19e Upload Logs"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: "MoneyMap-Logs-Build-${{ github.run_number }}"
-          retention-days: 30
-          if-no-files-found: warn
-          path: "automation/reports/logs/"
-
-      - name: "Stage 19f Upload Summary and APK"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: "MoneyMap-Summary-APK-Build-${{ github.run_number }}"
-          retention-days: 30
-          if-no-files-found: warn
-          path: |
-            automation/Test Results/Summary/
-            ${{ env.APK_PATH }}
-
-      # ── Stage 20: GitHub Pages deployment ─────────────────
-      - name: "Stage 20a Prepare GitHub Pages Deploy Structure"
-        if: always()
+      - name: "Stage Deploy to GitHub Pages"
         env:
           GH_RUN_NUMBER: ${{ github.run_number }}
           GH_REF_NAME: ${{ github.ref_name }}
@@ -330,62 +362,39 @@ jobs:
             cp -r gh-pages-clone/reports/history/* deploy_site/reports/history/ 2>/dev/null || true
           fi
 
-          cp "automation/Test Results/HTML/execution-report.html" deploy_site/reports/latest/ 2>/dev/null || echo "execution-report.html not generated yet"
+          cp "automation/Test Results/HTML/execution-report.html" deploy_site/reports/latest/ 2>/dev/null || true
           cp "automation/Test Results/HTML/dashboard.html"        deploy_site/reports/latest/ 2>/dev/null || true
           cp "automation/Test Results/HTML/trends.html"           deploy_site/reports/latest/ 2>/dev/null || true
           cp "automation/Test Results/JSON/execution-results.json" deploy_site/reports/latest/ 2>/dev/null || true
-          cp "automation/Test Results/Summary/summary.md"         deploy_site/reports/latest/ 2>/dev/null || true
           cp -r automation/reports/screenshots                     deploy_site/reports/latest/ 2>/dev/null || true
           cp -r automation/reports/logs                            deploy_site/reports/latest/ 2>/dev/null || true
 
           cp "automation/Test Results/HTML/execution-report.html" "deploy_site/reports/history/build-${GH_RUN_NUMBER}/" 2>/dev/null || true
           cp "automation/Test Results/JSON/execution-results.json" "deploy_site/reports/history/build-${GH_RUN_NUMBER}/" 2>/dev/null || true
-          cp "automation/Test Results/Summary/summary.md"         "deploy_site/reports/history/build-${GH_RUN_NUMBER}/" 2>/dev/null || true
 
           chmod +x automation/.github-scripts/generate-pages.py
-          python3 automation/.github-scripts/generate-pages.py
+          python3 automation/.github-scripts/generate-pages.py || echo "No custom pages script ran"
 
-          echo "Generated files:"
-          find deploy_site -name "*.html" | head -20
-
-      - name: "Stage 20b Deploy Reports to GitHub Pages"
-        if: always()
+      - name: "Deploy to GitHub Pages"
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: deploy_site
           clean: false
-          commit-message: "E2E Report Build ${{ github.run_number }} ${{ github.sha }}"
+          commit-message: "Consolidated E2E Report Build ${{ github.run_number }} ${{ github.sha }}"
 
-      # ── Stage 21: Actions summary ──────────────────────────
-      - name: "Stage 21 Publish GitHub Actions Summary"
-        if: always()
+      - name: "Publish Step Summary"
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d/ -f2)
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/reports/latest/execution-report.html"
-          SUMMARY_FILE="automation/Test Results/Summary/summary.md"
-
           {
-            echo "## MoneyMap Android Appium E2E Execution Summary"
+            echo "## MoneyMap Consolidated E2E Execution Summary"
             echo ""
-            echo "| Field | Value |"
+            echo "| Metric | Value |"
             echo "|---|---|"
             echo "| **Build Number** | #${{ github.run_number }} |"
-            echo "| **Date** | $(date '+%Y-%m-%d %H:%M UTC') |"
-            echo "| **Commit** | ${{ github.sha }} |"
-            echo "| **Branch** | ${{ github.ref_name }} |"
-            echo "| **APK Size** | ${{ env.APK_SIZE }} |"
-            echo "| **Device** | Android ${{ env.ANDROID_API_LEVEL }} Emulator x86_64 |"
-            echo "| **Test Cases** | 510+ |"
-            echo "| **Live Report** | ${REPORT_URL} |"
+            echo "| **Live HTML Report** | [Open Consolidated Report](${REPORT_URL}) |"
+            echo "| **Git Branch** | ${{ github.ref_name }} |"
+            echo "| **Git Commit** | ${{ github.sha }} |"
             echo ""
-            if [ -f "$SUMMARY_FILE" ]; then
-              cat "$SUMMARY_FILE"
-            else
-              echo "### Test summary not generated — check Logs artifact for mvn-execution.log"
-            fi
-            echo ""
-            echo "Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           } >> "$GITHUB_STEP_SUMMARY"
-
-          echo "Summary published"

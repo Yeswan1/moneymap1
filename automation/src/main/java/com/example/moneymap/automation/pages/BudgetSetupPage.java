@@ -8,53 +8,39 @@ import org.openqa.selenium.By;
  */
 public class BudgetSetupPage extends BasePage {
 
-    private final By totalLimitField = By.id("com.example.moneymap:id/et_total_limit");
-    private final By foodBudgetField = By.id("com.example.moneymap:id/et_food_budget");
-    private final By shoppingBudgetField = By.id("com.example.moneymap:id/et_shopping_budget");
-    private final By transportBudgetField = By.id("com.example.moneymap:id/et_transport_budget");
-    private final By entertainmentBudgetField = By.id("com.example.moneymap:id/et_entertainment_budget");
     private final By finishButton = By.xpath(
-            "//*[@resource-id='com.example.moneymap:id/btn_finish' " +
-            "or @text='Complete Setup' or @content-desc='Complete Setup']");
+            "//*[@text='Complete Setup' or @content-desc='Complete Setup' or contains(@text, 'Finish')]");
 
     public BudgetSetupPage(AndroidDriver driver) {
         super(driver);
     }
 
+    public void enterBudgetForCategory(String categoryName, String amount) {
+        By editField = By.xpath(
+            "//android.widget.TextView[@text='" + categoryName + "']/ancestor::android.view.View//android.widget.EditText" +
+            " | //android.widget.TextView[@text='" + categoryName + "']/../../..//android.widget.EditText"
+        );
+        clearAndType(editField, amount);
+    }
+
     public void enterTotalLimit(String amount) {
-        try {
-            clearAndType(totalLimitField, amount);
-        } catch (Exception e) {
-            clearAndType(By.xpath("//android.widget.EditText[1]"), amount);
-        }
+        // Total Limit is computed automatically in the Compose UI based on category limits.
+        // Leave as no-op to support compatibility.
     }
 
     public void enterFoodBudget(String amount) {
-        try {
-            clearAndType(foodBudgetField, amount);
-        } catch (Exception e) {
-            clearAndType(By.xpath("//android.widget.EditText[2]"), amount);
-        }
+        enterBudgetForCategory("Food", amount);
     }
 
     public void enterShoppingBudget(String amount) {
-        try {
-            clearAndType(shoppingBudgetField, amount);
-        } catch (Exception e) {
-            clearAndType(By.xpath("//android.widget.EditText[3]"), amount);
-        }
+        enterBudgetForCategory("Shopping", amount);
     }
 
     public void enterTransportBudget(String amount) {
-        try {
-            clearAndType(transportBudgetField, amount);
-        } catch (Exception e) {
-            clearAndType(By.xpath("//android.widget.EditText[4]"), amount);
-        }
+        enterBudgetForCategory("Transport", amount);
     }
 
     public void setupBudgets(String total, String food, String transport) {
-        enterTotalLimit(total);
         enterFoodBudget(food);
         enterTransportBudget(transport);
         scrollToText("Complete Setup");
@@ -66,6 +52,6 @@ public class BudgetSetupPage extends BasePage {
     }
 
     public boolean isBudgetSetupDisplayed() {
-        return isTextVisible("Budget Setup") || isTextVisible("TOTAL MONTHLY LIMIT");
+        return isTextVisible("Set Your Budget") || isTextVisible("Complete Setup");
     }
 }

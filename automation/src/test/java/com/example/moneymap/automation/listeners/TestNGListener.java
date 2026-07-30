@@ -65,12 +65,57 @@ public class TestNGListener implements ITestListener, ISuiteListener {
         // Capture artifacts
         String screenshotPath = "";
         String deviceLogPath = "";
+        String pageSourcePath = "";
+        String appiumLogPath = "";
+        String locatorUsed = "";
+        String activity = "";
+        String pkg = "";
+
         try {
             AndroidDriver driver = AppiumDriverFactory.getDriver();
             if (driver != null && AppiumDriverFactory.isDriverAlive()) {
                 String testId = tc != null ? tc.getTestId() : "UNKNOWN";
                 screenshotPath = ScreenshotUtil.captureScreenshot(driver, testId);
                 deviceLogPath = LogUtil.captureDeviceLogs(driver, testId);
+                appiumLogPath = LogUtil.captureAppiumLogs(driver, testId);
+
+                try {
+                    activity = driver.currentActivity();
+                    pkg = driver.getCurrentPackage();
+                } catch (Exception ignored) {}
+
+                try {
+                    String pageSource = driver.getPageSource();
+                    String logDir = "reports/logs/";
+                    if (new java.io.File("automation").exists()) {
+                        logDir = "automation/reports/logs/";
+                    }
+                    java.io.File dir = new java.io.File(logDir);
+                    if (!dir.exists()) dir.mkdirs();
+
+                    java.io.File sourceFile = new java.io.File(dir, testId + "_pagesource.xml");
+                    try (java.io.FileWriter fw = new java.io.FileWriter(sourceFile)) {
+                        fw.write(pageSource);
+                    }
+                    pageSourcePath = "logs/" + sourceFile.getName();
+                } catch (Exception ignored) {}
+
+                if (throwable != null) {
+                    String msg = throwable.getMessage();
+                    if (msg != null) {
+                        if (msg.contains("By.")) {
+                            int idx = msg.indexOf("By.");
+                            int end = msg.indexOf(" ", idx);
+                            if (end == -1) end = msg.length();
+                            locatorUsed = msg.substring(idx, end);
+                        } else if (msg.contains("locator:")) {
+                            int idx = msg.indexOf("locator:");
+                            int end = msg.indexOf("\n", idx);
+                            if (end == -1) end = msg.length();
+                            locatorUsed = msg.substring(idx, end).trim();
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             LogUtil.logError("Listener failed to capture artifacts", e);
@@ -78,7 +123,8 @@ public class TestNGListener implements ITestListener, ISuiteListener {
 
         if (tc != null) {
             BaseTest.updateTestCase(tc.getTestId(), "FAILED",
-                    fullReason, duration, screenshotPath, deviceLogPath);
+                    fullReason, duration, screenshotPath, deviceLogPath,
+                    pageSourcePath, appiumLogPath, locatorUsed, activity, pkg);
             LogUtil.logTestFail(tc.getTestId(), errorMessage, duration);
         }
     }

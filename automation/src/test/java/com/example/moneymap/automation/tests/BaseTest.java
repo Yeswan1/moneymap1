@@ -91,7 +91,36 @@ public class BaseTest {
 
     // ─── Test Case loading ────────────────────────────────────────────────────
 
+    private static boolean shouldIncludeTestCase(String module, String shard) {
+        if (shard == null || shard.isEmpty() || shard.equalsIgnoreCase("all")) return true;
+        String modLower = module.toLowerCase();
+        switch (shard.toLowerCase()) {
+            case "auth":
+                return modLower.contains("auth") || modLower.contains("register") || modLower.contains("session");
+            case "dashboard":
+                return modLower.contains("dashboard") || modLower.contains("profile") || modLower.contains("navigation");
+            case "transactions":
+                return modLower.contains("crud") || modLower.contains("form") || modLower.contains("search") || modLower.contains("filter") || modLower.contains("file");
+            case "budget":
+                return modLower.contains("budget");
+            case "settings":
+                return modLower.contains("settings") || modLower.contains("accessibility") || modLower.contains("responsive");
+            case "reports":
+                boolean isOther = modLower.contains("auth") || modLower.contains("register") || modLower.contains("session")
+                        || modLower.contains("dashboard") || modLower.contains("profile") || modLower.contains("navigation")
+                        || modLower.contains("crud") || modLower.contains("form") || modLower.contains("search") || modLower.contains("filter") || modLower.contains("file")
+                        || modLower.contains("budget")
+                        || modLower.contains("settings") || modLower.contains("accessibility") || modLower.contains("responsive");
+                return !isOther;
+            default:
+                return true;
+        }
+    }
+
     private void loadTestCasesCatalog() {
+        String shard = System.getProperty("testShard", "all");
+        LogUtil.log("Filtering tests for shard: " + shard);
+        
         String[] searchPaths = {
             "automation/data/test_cases.json",
             "data/test_cases.json",
@@ -104,9 +133,13 @@ public class BaseTest {
                     JSONArray arr = new JSONArray(new JSONTokener(reader));
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject obj = arr.getJSONObject(i);
+                        String module = obj.optString("module");
+                        if (!shouldIncludeTestCase(module, shard)) {
+                            continue;
+                        }
                         TestCase tc = new TestCase(
                             obj.optString("testId"),
-                            obj.optString("module"),
+                            module,
                             obj.optString("name"),
                             obj.optString("priority", "MEDIUM"),
                             obj.optString("preconditions", ""),
@@ -116,7 +149,7 @@ public class BaseTest {
                         );
                         testCases.add(tc);
                     }
-                    LogUtil.log("Loaded " + testCases.size() + " test cases from: " + path);
+                    LogUtil.log("Loaded " + testCases.size() + " test cases for shard " + shard + " from: " + path);
                     return;
                 } catch (Exception e) {
                     LogUtil.logError("Error loading test catalog from " + path, e);
@@ -128,6 +161,7 @@ public class BaseTest {
     }
 
     private void generateSyntheticTestCases() {
+        String shard = System.getProperty("testShard", "all");
         String[][] modules = {
             {"Authentication", "40"}, {"Authorization", "30"}, {"Registration", "20"},
             {"Profile Management", "20"}, {"Navigation", "30"}, {"Dashboard", "20"},
@@ -140,6 +174,9 @@ public class BaseTest {
         int id = 1;
         for (String[] moduleInfo : modules) {
             String module = moduleInfo[0];
+            if (!shouldIncludeTestCase(module, shard)) {
+                continue;
+            }
             int count = Integer.parseInt(moduleInfo[1]);
             String prefix = module.replaceAll("[^A-Z]", "").substring(0, Math.min(4, module.replaceAll("[^A-Z]","").length()));
             if (prefix.isEmpty()) prefix = module.substring(0,3).toUpperCase();
@@ -151,13 +188,19 @@ public class BaseTest {
                 ));
             }
         }
-        LogUtil.log("Generated " + testCases.size() + " synthetic test cases.");
+        LogUtil.log("Generated " + testCases.size() + " synthetic test cases for shard " + shard);
     }
 
     // ─── Test case result update ──────────────────────────────────────────────
 
     public static synchronized void updateTestCase(String testId, String status,
             String actualResult, long durationMs, String screenshot, String deviceLog) {
+        updateTestCase(testId, status, actualResult, durationMs, screenshot, deviceLog, "", "", "", "", "");
+    }
+
+    public static synchronized void updateTestCase(String testId, String status,
+            String actualResult, long durationMs, String screenshot, String deviceLog,
+            String pageSource, String appiumLog, String locatorUsed, String activity, String pkg) {
         for (TestCase tc : testCases) {
             if (tc.getTestId().equalsIgnoreCase(testId)) {
                 tc.setStatus(status);
@@ -165,6 +208,11 @@ public class BaseTest {
                 tc.setDurationMs(durationMs);
                 if (screenshot != null && !screenshot.isEmpty()) tc.setScreenshotPath(screenshot);
                 if (deviceLog != null && !deviceLog.isEmpty())   tc.setDeviceLogPath(deviceLog);
+                if (pageSource != null && !pageSource.isEmpty()) tc.setPageSourcePath(pageSource);
+                if (appiumLog != null && !appiumLog.isEmpty())   tc.setAppiumLogPath(appiumLog);
+                if (locatorUsed != null && !locatorUsed.isEmpty()) tc.setLocatorUsed(locatorUsed);
+                if (activity != null && !activity.isEmpty())     tc.setCurrentActivity(activity);
+                if (pkg != null && !pkg.isEmpty())               tc.setCurrentPackage(pkg);
                 return;
             }
         }
@@ -286,6 +334,11 @@ public class BaseTest {
             obj.put("durationMs",    tc.getDurationMs());
             obj.put("screenshotPath",tc.getScreenshotPath());
             obj.put("deviceLogPath", tc.getDeviceLogPath());
+            obj.put("pageSourcePath",tc.getPageSourcePath());
+            obj.put("appiumLogPath", tc.getAppiumLogPath());
+            obj.put("locatorUsed",   tc.getLocatorUsed());
+            obj.put("currentActivity",tc.getCurrentActivity());
+            obj.put("currentPackage",tc.getCurrentPackage());
             arr.put(obj);
         }
         // Also write execution metadata

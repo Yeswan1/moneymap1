@@ -22,6 +22,7 @@
         <json.version>20240303</json.version>
         <slf4j.version>2.0.12</slf4j.version>
         <commons.io.version>2.15.1</commons.io.version>
+        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
     </properties>
 
     <dependencyManagement>
@@ -107,11 +108,16 @@
                 <version>3.2.5</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                        <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
                     </suiteXmlFiles>
                     <!-- Never skip test failures — let the suite decide pass/fail threshold -->
                     <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.1</version>
             </plugin>
         </plugins>
     </build>

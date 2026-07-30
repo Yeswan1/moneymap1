@@ -14,6 +14,11 @@ public class TestCase {
     private long durationMs;
     private String screenshotPath = "";
     private String deviceLogPath = "";
+    private String pageSourcePath = "";
+    private String appiumLogPath = "";
+    private String locatorUsed = "";
+    private String currentActivity = "";
+    private String currentPackage = "";
 
     public TestCase() {}
 
@@ -68,4 +73,19 @@ public class TestCase {
 
     public String getDeviceLogPath() { return deviceLogPath; }
     public void setDeviceLogPath(String deviceLogPath) { this.deviceLogPath = deviceLogPath; }
+
+    public String getPageSourcePath() { return pageSourcePath; }
+    public void setPageSourcePath(String pageSourcePath) { this.pageSourcePath = pageSourcePath; }
+
+    public String getAppiumLogPath() { return appiumLogPath; }
+    public void setAppiumLogPath(String appiumLogPath) { this.appiumLogPath = appiumLogPath; }
+
+    public String getLocatorUsed() { return locatorUsed; }
+    public void setLocatorUsed(String locatorUsed) { this.locatorUsed = locatorUsed; }
+
+    public String getCurrentActivity() { return currentActivity; }
+    public void setCurrentActivity(String currentActivity) { this.currentActivity = currentActivity; }
+
+    public String getCurrentPackage() { return currentPackage; }
+    public void setCurrentPackage(String currentPackage) { this.currentPackage = currentPackage; }
 }

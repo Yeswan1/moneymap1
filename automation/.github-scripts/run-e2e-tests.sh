@@ -94,14 +94,22 @@ while true; do
 done
 
 # ── 6. Run Maven / TestNG tests ─────────────────────────────
-echo "Executing 510+ E2E tests..."
+# Read TEST_SHARD from environment (default to all)
+SHARD="${TEST_SHARD:-all}"
+echo "Running Maven tests for shard: $SHARD"
+
+if [ "$SHARD" = "all" ]; then
+  SUITE_FILE="src/test/resources/testng.xml"
+else
+  SUITE_FILE="src/test/resources/testng-${SHARD}.xml"
+fi
+echo "Using suite XML file: $SUITE_FILE"
+
 cd automation
 
 # Print Maven diagnostic information for version verification
 echo "=== MAVEN DIAGNOSTICS ==="
 mvn -version
-mvn dependency:tree -Dverbose
-mvn help:effective-pom
 echo "========================="
 
 # Run Maven and preserve its exit code correctly.
@@ -109,6 +117,8 @@ echo "========================="
 # Instead: run Maven with output going to log, then replay to stdout.
 MVN_LOG="../automation/reports/logs/mvn-execution.log"
 mvn clean test \
+  -DsuiteXmlFile="$SUITE_FILE" \
+  -DtestShard="$SHARD" \
   -DGITHUB_RUN_NUMBER="$GITHUB_RUN_NUMBER" \
   -DGITHUB_SHA="$GITHUB_SHA" \
   -DGITHUB_REF_NAME="$GITHUB_REF_NAME" \
