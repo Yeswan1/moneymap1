@@ -385,16 +385,20 @@ jobs:
 
       - name: "Publish Step Summary"
         run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | cut -d/ -f2)
-          REPORT_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/reports/latest/execution-report.html"
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d/ -f2 | tr '[:upper:]' '[:lower:]')
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPORT_URL="https://${OWNER}.github.io/${REPO_NAME}/reports/latest/execution-report.html"
+          DASHBOARD_URL="https://${OWNER}.github.io/${REPO_NAME}/reports/latest/dashboard.html"
           {
             echo "## MoneyMap Consolidated E2E Execution Summary"
             echo ""
             echo "| Metric | Value |"
             echo "|---|---|"
             echo "| **Build Number** | #${{ github.run_number }} |"
-            echo "| **Live HTML Report** | [Open Consolidated Report](${REPORT_URL}) |"
+            echo "| **Live HTML Report** | [📄 Open Execution Report](${REPORT_URL}) |"
+            echo "| **Live Dashboard** | [📊 Open Dashboard](${DASHBOARD_URL}) |"
             echo "| **Git Branch** | ${{ github.ref_name }} |"
             echo "| **Git Commit** | ${{ github.sha }} |"
             echo ""
+            echo "> Copy and open this URL in your browser: \`${REPORT_URL}\`"
           } >> "$GITHUB_STEP_SUMMARY"
