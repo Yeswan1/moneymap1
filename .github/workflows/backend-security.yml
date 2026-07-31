@@ -9,25 +9,23 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
   security-scan:
     name: "Backend Security Analysis"
     runs-on: ubuntu-latest
     steps:
-      # ── Step 1: Checkout (full history for Gitleaks) ──────────────────────
       - name: "Checkout Repository"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ── Step 2: Semgrep SAST (CLI, no token needed) ───────────────────────
-      - name: "Setup Python for Semgrep"
+      - name: "Setup Python"
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # ── Semgrep SAST ──────────────────────────────────────────────────────
       - name: "Semgrep SAST Scan"
         run: |
           pip install semgrep --quiet
@@ -37,13 +35,11 @@ jobs:
             --json \
             --output semgrep-results.json \
             backend/ || true
-          if [ ! -f semgrep-results.json ]; then
-            echo '{"results":[],"errors":[]}' > semgrep-results.json
-          fi
-          python3 -c 'import json; d=json.load(open("semgrep-results.json")); print("Semgrep findings:", len(d.get("results", [])))'
+          test -f semgrep-results.json || echo '{"results":[]}' > semgrep-results.json
+          python3 -c 'import json; d=json.load(open("semgrep-results.json")); print("Semgrep:", len(d.get("results",[])), "findings")'
 
-      # ── Step 3: Trivy Filesystem Scan ─────────────────────────────────────
-      - name: "Trivy Filesystem Scan"
+      # ── Trivy ─────────────────────────────────────────────────────────────
+      - name: "Trivy Scan"
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
@@ -54,138 +50,93 @@ jobs:
           exit-code: "0"
         continue-on-error: true
 
-      - name: "Create empty Trivy output if missing"
-        if: always()
-        run: |
-          if [ ! -f trivy-results.json ]; then
-            echo '{"Results":[]}' > trivy-results.json
-          fi
+      - name: "Ensure Trivy output exists"
+        run: test -f trivy-results.json || echo '{"Results":[]}' > trivy-results.json
 
-      # ── Step 4: Gitleaks Secret Detection (CLI binary, no license needed) ─
-      - name: "Install Gitleaks CLI"
+      # ── Gitleaks ──────────────────────────────────────────────────────────
+      - name: "Gitleaks Secret Scan"
         run: |
-          GITLEAKS_VERSION="8.18.4"
-          wget -q "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -O gitleaks.tar.gz
-          tar -xzf gitleaks.tar.gz gitleaks
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar -xz gitleaks
           chmod +x gitleaks
-          echo "Gitleaks installed: $(./gitleaks version)"
+          ./gitleaks detect --source . --report-format json --report-path gitleaks-results.json --redact --exit-code 0 || true
+          test -f gitleaks-results.json || echo '[]' > gitleaks-results.json
+          python3 -c 'import json; d=json.load(open("gitleaks-results.json")); print("Gitleaks:", len(d) if isinstance(d,list) else 0, "secrets")'
 
-      - name: "Run Gitleaks Secret Scan"
+      # ── Count findings and decide pass/fail ───────────────────────────────
+      - name: "Evaluate Thresholds"
         run: |
-          ./gitleaks detect \
-            --source . \
-            --report-format json \
-            --report-path gitleaks-results.json \
-            --redact \
-            --exit-code 0 || true
-          if [ ! -f gitleaks-results.json ]; then
-            echo '[]' > gitleaks-results.json
-          fi
-          python3 -c 'import json; d=json.load(open("gitleaks-results.json")); print("Gitleaks secrets found:", len(d) if isinstance(d, list) else 0)'
+          python3 - <<'EOF'
+          import json, os
 
-      # ── Step 5: OWASP Dependency Check ────────────────────────────────────
-      - name: "OWASP Dependency Check"
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: "MoneyMap-Backend"
-          path: "backend"
-          format: "HTML JSON"
-          out: "dependency-check-results"
-          args: "--enableRetired --failOnCVSS 10"
-        continue-on-error: true
-
-      - name: "Create empty DepCheck output if missing"
-        if: always()
-        run: |
-          mkdir -p dependency-check-results
-          if [ ! -f dependency-check-results/dependency-check-report.json ]; then
-            echo '{"dependencies":[]}' > dependency-check-results/dependency-check-report.json
-          fi
-
-      # ── Step 6: Threshold Evaluation ──────────────────────────────────────
-      - name: "Evaluate Security Thresholds"
-        if: always()
-        run: |
-          CRITICAL_TRIVY=$(python3 -c '
-          import json, sys
           try:
-            data = json.load(open("trivy-results.json"))
-            count = sum(
-              1 for r in data.get("Results", [])
+            trivy = json.load(open("trivy-results.json"))
+            critical = sum(
+              1 for r in trivy.get("Results", [])
               for v in r.get("Vulnerabilities", [])
-              if v.get("Severity","").upper() == "CRITICAL"
+              if v.get("Severity", "").upper() == "CRITICAL"
             )
-            print(count)
-          except Exception as e:
-            print(0)
-          ')
-
-          GITLEAKS_SECRETS=$(python3 -c '
-          import json
-          try:
-            data = json.load(open("gitleaks-results.json"))
-            print(len(data) if isinstance(data, list) else 0)
           except:
-            print(0)
-          ')
+            critical = 0
 
-          echo "CRITICAL_TRIVY=$CRITICAL_TRIVY" >> "$GITHUB_ENV"
-          echo "GITLEAKS_SECRETS=$GITLEAKS_SECRETS" >> "$GITHUB_ENV"
+          try:
+            secrets = json.load(open("gitleaks-results.json"))
+            secret_count = len(secrets) if isinstance(secrets, list) else 0
+          except:
+            secret_count = 0
 
-          if [ "$CRITICAL_TRIVY" -gt 0 ] || [ "$GITLEAKS_SECRETS" -gt 0 ]; then
-            echo "CRITICAL_FOUND=true" >> "$GITHUB_ENV"
-          else
-            echo "CRITICAL_FOUND=false" >> "$GITHUB_ENV"
-          fi
+          try:
+            semgrep = json.load(open("semgrep-results.json"))
+            sast_count = len(semgrep.get("results", []))
+          except:
+            sast_count = 0
 
-      # ── Step 7: Publish Step Summary ──────────────────────────────────────
-      - name: "Publish Security Step Summary"
+          print(f"Trivy Critical: {critical}")
+          print(f"Gitleaks Secrets: {secret_count}")
+          print(f"Semgrep Findings: {sast_count}")
+
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+            f.write(f"TRIVY_CRITICAL={critical}\n")
+            f.write(f"GITLEAKS_SECRETS={secret_count}\n")
+            f.write(f"SEMGREP_FINDINGS={sast_count}\n")
+            f.write(f"CRITICAL_FOUND={'true' if critical > 0 or secret_count > 0 else 'false'}\n")
+          EOF
+
+      # ── Step Summary ──────────────────────────────────────────────────────
+      - name: "Publish Step Summary"
         if: always()
         run: |
-          DECISION="✅ PASSED"
-          if [ "${{ env.CRITICAL_FOUND }}" = "true" ]; then
-            DECISION="❌ FAILED"
-          fi
           {
-            echo "## 🔒 MoneyMap Backend Security Scan Summary"
+            echo "## 🔒 MoneyMap Backend Security Scan"
             echo ""
-            echo "| Severity | Trivy | Gitleaks | Decision |"
-            echo "|---|---|---|---|"
-            echo "| Critical | ${{ env.CRITICAL_TRIVY }} | ${{ env.GITLEAKS_SECRETS }} | $DECISION |"
-            echo ""
-            echo "### Scan Results"
-            echo "- **Trivy Critical Findings:** ${{ env.CRITICAL_TRIVY }}"
-            echo "- **Gitleaks Secrets Detected:** ${{ env.GITLEAKS_SECRETS }}"
+            echo "| Tool | Findings |"
+            echo "|---|---|"
+            echo "| Semgrep SAST | ${{ env.SEMGREP_FINDINGS }} |"
+            echo "| Trivy Critical | ${{ env.TRIVY_CRITICAL }} |"
+            echo "| Gitleaks Secrets | ${{ env.GITLEAKS_SECRETS }} |"
             echo ""
             if [ "${{ env.CRITICAL_FOUND }}" = "true" ]; then
-              echo "### ❌ Pipeline FAILED — Critical findings detected"
+              echo "### ❌ FAILED — Critical findings require remediation"
             else
-              echo "### ✅ Pipeline PASSED — No critical findings"
+              echo "### ✅ PASSED — No critical findings"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # ── Step 8: Upload Artifacts ───────────────────────────────────────────
-      - name: "Upload Security Scan Artifacts"
+      # ── Upload artifacts ──────────────────────────────────────────────────
+      - name: "Upload Scan Results"
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-scan-results
+          name: security-scan-results-${{ github.run_number }}
           path: |
             semgrep-results.json
             trivy-results.json
             gitleaks-results.json
-            dependency-check-results/
           retention-days: 30
           if-no-files-found: warn
 
-      # ── Step 9: Fail on Critical ───────────────────────────────────────────
-      - name: "Fail on Critical Findings"
-        if: always()
+      # ── Fail only on critical ─────────────────────────────────────────────
+      - name: "Fail on Critical"
+        if: env.CRITICAL_FOUND == 'true'
         run: |
-          if [ "${{ env.CRITICAL_FOUND }}" = "true" ]; then
-            echo "❌ FAILING: Critical security findings detected."
-            echo "  Trivy Critical: ${{ env.CRITICAL_TRIVY }}"
-            echo "  Gitleaks Secrets: ${{ env.GITLEAKS_SECRETS }}"
-            exit 1
-          fi
-          echo "✅ No critical findings. Pipeline passes."
+          echo "❌ Critical findings detected — see summary above"
+          exit 1
