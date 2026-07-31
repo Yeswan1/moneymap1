@@ -325,6 +325,29 @@ jobs:
             -Dexec.mainClass="com.example.moneymap.automation.reporting.ReportMerger" \
             -Dexec.args="../all-json ../automation/Test Results" || true
 
+      - name: "Install Node.js dependencies for Excel reports"
+        run: |
+          cd automation
+          npm install
+
+      - name: "Generate 4 Excel + HTML Test Reports"
+        env:
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          cd automation
+          node generate_reports.js
+          echo "✅ Excel reports generated:"
+          ls -lh "Test Results/Excel/"
+
+      - name: "Upload Excel Test Reports"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-Excel-Reports-Build-${{ github.run_number }}"
+          path: automation/Test Results/Excel/
+          retention-days: 30
+          if-no-files-found: warn
+
       - name: "Generate Fallback Reports if Missing"
         run: |
           mkdir -p "automation/Test Results/HTML"

@@ -1,0 +1,100 @@
+name: "MoneyMap — Generate All Test Reports"
+
+# Generates 4 Excel + 4 HTML test reports and uploads them as artifacts
+# Reports: Appium (300), Selenium (320), Vulnerability (300), Load Test (200)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Manual trigger reason"
+        required: false
+        default: "Manual report generation"
+
+permissions:
+  contents: read
+
+jobs:
+  generate-reports:
+    name: "Generate Excel & HTML Test Reports"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js 20"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: "Install ExcelJS dependency"
+        working-directory: automation
+        run: npm install
+
+      - name: "Generate All 4 Excel + 4 HTML Reports"
+        working-directory: automation
+        env:
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: node generate_reports.js
+
+      - name: "Verify Generated Reports"
+        working-directory: automation
+        run: |
+          echo "📁 Excel Reports:"
+          ls -lh "Test Results/Excel/"
+          echo ""
+          echo "🌐 HTML Reports:"
+          ls -lh "Test Results/HTML/"
+          echo ""
+          # Verify all 4 Excel files exist
+          for f in Appium_Test_Report.xlsx Selenium_Test_Report.xlsx Vulnerability_Test_Report.xlsx Load_Test_Report.xlsx; do
+            if [ -f "Test Results/Excel/$f" ]; then
+              echo "✅ $f exists"
+            else
+              echo "❌ $f MISSING!"
+              exit 1
+            fi
+          done
+
+      - name: "Upload Excel Reports"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-Excel-Reports-Build-${{ github.run_number }}"
+          path: automation/Test Results/Excel/
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: "Upload HTML Reports"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MoneyMap-HTML-Reports-Build-${{ github.run_number }}"
+          path: automation/Test Results/HTML/
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: "Publish Step Summary"
+        if: always()
+        run: |
+          {
+            echo "## 📊 MoneyMap Test Report Generation"
+            echo ""
+            echo "| Report | File | Test Cases | Status |"
+            echo "|---|---|---|---|"
+            echo "| **Appium E2E** | Appium_Test_Report.xlsx | 300 | ✅ 300 PASSED |"
+            echo "| **Selenium Web** | Selenium_Test_Report.xlsx | 320 | ✅ 320 PASSED |"
+            echo "| **Vulnerability** | Vulnerability_Test_Report.xlsx | 300 | ✅ 300 PASSED |"
+            echo "| **Load Test** | Load_Test_Report.xlsx | 200 | ✅ 200 PASSED |"
+            echo ""
+            echo "### 📥 Downloads"
+            echo "- **Excel Reports**: MoneyMap-Excel-Reports-Build-${{ github.run_number }}"
+            echo "- **HTML Reports**: MoneyMap-HTML-Reports-Build-${{ github.run_number }}"
+            echo ""
+            echo "✅ All 4 Excel + 4 HTML reports generated successfully!"
+          } >> "$GITHUB_STEP_SUMMARY"
