@@ -1,6 +1,6 @@
-[2026-09-30 07:44:23.218] [INFO ] Excel saved: ../automation/Test/Excel/Automation_Test_Report.xlsx
-[2026-09-30 07:44:23.487] [INFO ] Excel saved: ../automation/Test/Excel/Passed_Test_Cases.xlsx
-[2026-09-30 07:44:23.509] [INFO ] Excel saved: ../automation/Test/Excel/Failed_Test_Cases.xlsx
-[2026-09-30 07:44:23.531] [INFO ] Excel saved: ../automation/Test/Excel/Execution_Summary.xlsx
-[2026-09-30 07:44:23.535] [INFO ] Excel reports generated in: ../automation/Test/Excel
-[2026-09-30 07:44:23.558] [INFO ] HTML reports generated in: ../automation/Test/HTML
+[2026-10-01 08:01:55.589] [INFO ] Excel saved: ../automation/Test/Excel/Automation_Test_Report.xlsx
+[2026-10-01 08:01:56.086] [INFO ] Excel saved: ../automation/Test/Excel/Passed_Test_Cases.xlsx
+[2026-10-01 08:01:56.113] [INFO ] Excel saved: ../automation/Test/Excel/Failed_Test_Cases.xlsx
+[2026-10-01 08:01:56.142] [INFO ] Excel saved: ../automation/Test/Excel/Execution_Summary.xlsx
+[2026-10-01 08:01:56.146] [INFO ] Excel reports generated in: ../automation/Test/Excel
+[2026-10-01 08:01:56.173] [INFO ] HTML reports generated in: ../automation/Test/HTML
