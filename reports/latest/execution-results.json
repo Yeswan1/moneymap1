@@ -1,8 +1,8 @@
 {
-  "buildNumber": "110",
+  "buildNumber": "111",
   "gitCommit": "ea50731a",
   "branch": "main",
-  "executedAt": "2026-10-18 06:51 UTC",
+  "executedAt": "2026-10-19 07:09 UTC",
   "testCases": [
     {
       "testData": "name: Alex, pocket money: 600, college: State University",
@@ -19,7 +19,7 @@
       "name": "Student Role Setup with All Fields",
       "testId": "TC_PROF_001",
       "locatorUsed": "",
-      "durationMs": 60,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -59,7 +59,7 @@
       "name": "Homemaker Role Setup",
       "testId": "TC_PROF_003",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -99,7 +99,7 @@
       "name": "Budget Setup with All Categories Filled",
       "testId": "TC_PROF_005",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -139,7 +139,7 @@
       "name": "Notification Preferences Toggle On",
       "testId": "TC_PROF_007",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -159,7 +159,7 @@
       "name": "Notification Preferences Toggle Off",
       "testId": "TC_PROF_008",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -199,7 +199,7 @@
       "name": "Onboarding Completion Persisted",
       "testId": "TC_PROF_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -219,7 +219,7 @@
       "name": "Budget Setup Empty Total Limit Validation",
       "testId": "TC_PROF_011",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -239,7 +239,7 @@
       "name": "Role Selection with Freelancer",
       "testId": "TC_PROF_012",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -259,7 +259,7 @@
       "name": "Profile Screen Displays User Email",
       "testId": "TC_PROF_013",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -279,7 +279,7 @@
       "name": "Profile Screen Displays User Name",
       "testId": "TC_PROF_014",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -339,7 +339,7 @@
       "name": "Notification Permission Allow Flow",
       "testId": "TC_PROF_017",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -359,7 +359,7 @@
       "name": "Notification Permission Not Now Flow",
       "testId": "TC_PROF_018",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -399,7 +399,7 @@
       "name": "Progress Bar Shows 100% on Budget Setup",
       "testId": "TC_PROF_020",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -419,7 +419,7 @@
       "name": "Bottom Navigation - Home Tab Active on Launch",
       "testId": "TC_NAV_001",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -459,7 +459,7 @@
       "name": "Navigate to Budget Tab",
       "testId": "TC_NAV_003",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -499,7 +499,7 @@
       "name": "Center Wallet FAB Navigates to Add Transaction",
       "testId": "TC_NAV_005",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -519,7 +519,7 @@
       "name": "Back Navigation from Add Transaction",
       "testId": "TC_NAV_006",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -539,7 +539,7 @@
       "name": "Transaction Item Click Goes to Details",
       "testId": "TC_NAV_007",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -559,7 +559,7 @@
       "name": "Edit Button on Transaction Details",
       "testId": "TC_NAV_008",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -579,7 +579,7 @@
       "name": "Back from Expense Details",
       "testId": "TC_NAV_009",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -619,7 +619,7 @@
       "name": "Navigate to Search Screen",
       "testId": "TC_NAV_011",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -639,7 +639,7 @@
       "name": "Navigate to Filter Screen",
       "testId": "TC_NAV_012",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -659,7 +659,7 @@
       "name": "Navigate to Categories Screen",
       "testId": "TC_NAV_013",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -699,7 +699,7 @@
       "name": "Navigate to Savings Goals Screen",
       "testId": "TC_NAV_015",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -719,7 +719,7 @@
       "name": "Navigate to Add Goal Screen",
       "testId": "TC_NAV_016",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -739,7 +739,7 @@
       "name": "Navigate to Chatbot Screen",
       "testId": "TC_NAV_017",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -779,7 +779,7 @@
       "name": "Navigate to Weekly Report Screen",
       "testId": "TC_NAV_019",
       "locatorUsed": "",
-      "durationMs": 57,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -819,7 +819,7 @@
       "name": "Navigate to Spending Trends",
       "testId": "TC_NAV_021",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -839,7 +839,7 @@
       "name": "Navigate to Category Analytics",
       "testId": "TC_NAV_022",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -859,7 +859,7 @@
       "name": "Navigate to Monthly Budget Screen",
       "testId": "TC_NAV_023",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -879,7 +879,7 @@
       "name": "Navigate to Weekly Budget Screen",
       "testId": "TC_NAV_024",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -899,7 +899,7 @@
       "name": "Splash Screen Auto-Navigates to Onboarding",
       "testId": "TC_NAV_025",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -919,7 +919,7 @@
       "name": "Transaction Success Back to Home",
       "testId": "TC_NAV_026",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -939,7 +939,7 @@
       "name": "Transaction Success Add Another",
       "testId": "TC_NAV_027",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -979,7 +979,7 @@
       "name": "Goal Progress Screen from Savings Goals",
       "testId": "TC_NAV_029",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1019,7 +1019,7 @@
       "name": "Dashboard Balance Card Visible",
       "testId": "TC_DAS_001",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1039,7 +1039,7 @@
       "name": "Dashboard Recent Transactions List Loads",
       "testId": "TC_DAS_002",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1079,7 +1079,7 @@
       "name": "Dashboard Quick Action - Add Transaction",
       "testId": "TC_DAS_004",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1119,7 +1119,7 @@
       "name": "Dashboard Budget Alert Badge on Notification Icon",
       "testId": "TC_DAS_006",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1139,7 +1139,7 @@
       "name": "Dashboard Shows Savings Overview",
       "testId": "TC_DAS_007",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1199,7 +1199,7 @@
       "name": "Dashboard Pull-to-Refresh Updates Data",
       "testId": "TC_DAS_010",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1239,7 +1239,7 @@
       "name": "Dashboard Chatbot FAB Visible",
       "testId": "TC_DAS_012",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1259,7 +1259,7 @@
       "name": "Dashboard Category Icons Match Transaction Types",
       "testId": "TC_DAS_013",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1319,7 +1319,7 @@
       "name": "Dashboard Loads Within 4 Seconds",
       "testId": "TC_DAS_016",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1339,7 +1339,7 @@
       "name": "Dashboard Smart Tips Section Visible",
       "testId": "TC_DAS_017",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1359,7 +1359,7 @@
       "name": "Dashboard Shows Correct User Greeting",
       "testId": "TC_DAS_018",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1379,7 +1379,7 @@
       "name": "Dashboard Bottom Navigation Active State",
       "testId": "TC_DAS_019",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1419,7 +1419,7 @@
       "name": "All Interactive Elements Have Content Descriptions",
       "testId": "TC_ACC_001",
       "locatorUsed": "",
-      "durationMs": 59,
+      "durationMs": 60,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1499,7 +1499,7 @@
       "name": "Back Button Has Content Description",
       "testId": "TC_ACC_005",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1519,7 +1519,7 @@
       "name": "Category Buttons Are Focusable",
       "testId": "TC_ACC_006",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1539,7 +1539,7 @@
       "name": "Bottom Navigation Items Are Labeled",
       "testId": "TC_ACC_007",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1559,7 +1559,7 @@
       "name": "Error Messages Are Announced to Screen Reader",
       "testId": "TC_ACC_008",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1579,7 +1579,7 @@
       "name": "Form Labels Associated with Inputs",
       "testId": "TC_ACC_009",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1599,7 +1599,7 @@
       "name": "Touch Target Size >= 48dp",
       "testId": "TC_ACC_010",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1639,7 +1639,7 @@
       "name": "Transaction Amount Screen Reader Readable",
       "testId": "TC_ACC_012",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1659,7 +1659,7 @@
       "name": "Progress Bar Has Accessibility Label",
       "testId": "TC_ACC_013",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1719,7 +1719,7 @@
       "name": "Screen Titles Announced on Navigation",
       "testId": "TC_ACC_016",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1739,7 +1739,7 @@
       "name": "Images Have Alt Text or Are Decorative",
       "testId": "TC_ACC_017",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 57,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1759,7 +1759,7 @@
       "name": "FAB Button Has Content Description",
       "testId": "TC_ACC_018",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1799,7 +1799,7 @@
       "name": "Focus Order Logical on Each Screen",
       "testId": "TC_ACC_020",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1839,7 +1839,7 @@
       "name": "UI Renders Correctly in Landscape Mode",
       "testId": "TC_RESP_002",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1859,7 +1859,7 @@
       "name": "Text Not Truncated on Smaller Screens",
       "testId": "TC_RESP_003",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1879,7 +1879,7 @@
       "name": "Scrollable Content on Long Screens",
       "testId": "TC_RESP_004",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1899,7 +1899,7 @@
       "name": "System Font Size Large Mode UI Adapts",
       "testId": "TC_RESP_005",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1919,7 +1919,7 @@
       "name": "Edge-to-Edge Display Support",
       "testId": "TC_RESP_006",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1959,7 +1959,7 @@
       "name": "Dark Theme Colors Consistent",
       "testId": "TC_RESP_008",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1979,7 +1979,7 @@
       "name": "Bottom Navigation Height Correct",
       "testId": "TC_RESP_009",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -1999,7 +1999,7 @@
       "name": "FAB Position Not Obscured by Keyboard",
       "testId": "TC_RESP_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2019,7 +2019,7 @@
       "name": "Valid Login with Correct Credentials",
       "testId": "TC_AUTH_001",
       "locatorUsed": "",
-      "durationMs": 58,
+      "durationMs": 62,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2039,7 +2039,7 @@
       "name": "Login with Invalid Password",
       "testId": "TC_AUTH_002",
       "locatorUsed": "",
-      "durationMs": 60,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2059,7 +2059,7 @@
       "name": "Login with Empty Email Field",
       "testId": "TC_AUTH_003",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2079,7 +2079,7 @@
       "name": "Login with Empty Password Field",
       "testId": "TC_AUTH_004",
       "locatorUsed": "",
-      "durationMs": 58,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2099,7 +2099,7 @@
       "name": "Login with Both Fields Empty",
       "testId": "TC_AUTH_005",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2119,7 +2119,7 @@
       "name": "Login with Invalid Email Format",
       "testId": "TC_AUTH_006",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2139,7 +2139,7 @@
       "name": "Password Visibility Toggle - Show Password",
       "testId": "TC_AUTH_007",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2159,7 +2159,7 @@
       "name": "Password Visibility Toggle - Hide Password",
       "testId": "TC_AUTH_008",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2179,7 +2179,7 @@
       "name": "Forgot Password Link Navigation",
       "testId": "TC_AUTH_009",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2219,7 +2219,7 @@
       "name": "Remember Me Checkbox Toggle",
       "testId": "TC_AUTH_011",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2239,7 +2239,7 @@
       "name": "Login with SQL Injection in Email",
       "testId": "TC_AUTH_012",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2259,7 +2259,7 @@
       "name": "Login with XSS in Email Field",
       "testId": "TC_AUTH_013",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2279,7 +2279,7 @@
       "name": "Session Persistence After App Restart",
       "testId": "TC_AUTH_014",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2319,7 +2319,7 @@
       "name": "Login with Unregistered Email",
       "testId": "TC_AUTH_016",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2359,7 +2359,7 @@
       "name": "Auto-focus on Email Field at App Launch",
       "testId": "TC_AUTH_018",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2379,7 +2379,7 @@
       "name": "Keyboard Dismiss on Tap Outside Input",
       "testId": "TC_AUTH_019",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2399,7 +2399,7 @@
       "name": "Login Button Disabled Until Fields Filled",
       "testId": "TC_AUTH_020",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2419,7 +2419,7 @@
       "name": "Login Loader Displayed During API Call",
       "testId": "TC_AUTH_021",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2439,7 +2439,7 @@
       "name": "Sign Up Link Navigates to Registration Screen",
       "testId": "TC_AUTH_022",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2459,7 +2459,7 @@
       "name": "Login Screen Title Text Verified",
       "testId": "TC_AUTH_023",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2479,7 +2479,7 @@
       "name": "Login Error Message Disappears on Retry",
       "testId": "TC_AUTH_024",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2499,7 +2499,7 @@
       "name": "Login with Very Long Password",
       "testId": "TC_AUTH_025",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2579,7 +2579,7 @@
       "name": "Simultaneous Multiple Login Attempts",
       "testId": "TC_AUTH_029",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2599,7 +2599,7 @@
       "name": "Login Screen UI Elements Verified",
       "testId": "TC_AUTH_030",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2619,7 +2619,7 @@
       "name": "Back Button Behavior on Login Screen",
       "testId": "TC_AUTH_031",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2659,7 +2659,7 @@
       "name": "Login with Tab Key Navigation",
       "testId": "TC_AUTH_033",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2679,7 +2679,7 @@
       "name": "Error Toast Dismissal",
       "testId": "TC_AUTH_034",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2699,7 +2699,7 @@
       "name": "Login After App Update",
       "testId": "TC_AUTH_035",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2719,7 +2719,7 @@
       "name": "Deep Link to Login Screen",
       "testId": "TC_AUTH_036",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2759,7 +2759,7 @@
       "name": "Verify Tagline Text on Login Screen",
       "testId": "TC_AUTH_038",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2819,7 +2819,7 @@
       "name": "Unauthenticated Access to Dashboard Blocked",
       "testId": "TC_AUTHZ_001",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2879,7 +2879,7 @@
       "name": "Valid Token Allows Dashboard Access",
       "testId": "TC_AUTHZ_004",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2939,7 +2939,7 @@
       "name": "User Cannot Access Another User's Transactions",
       "testId": "TC_AUTHZ_007",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2979,7 +2979,7 @@
       "name": "Currency Preference Stored in Session",
       "testId": "TC_AUTHZ_009",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -2999,7 +2999,7 @@
       "name": "Session Cleared on Explicit Logout",
       "testId": "TC_AUTHZ_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3019,7 +3019,7 @@
       "name": "User Cannot Delete Others' Transactions",
       "testId": "TC_AUTHZ_011",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3039,7 +3039,7 @@
       "name": "Profile Screen Shows Logged-In User Only",
       "testId": "TC_AUTHZ_012",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3059,7 +3059,7 @@
       "name": "No Data Leakage on Screen Rotation",
       "testId": "TC_AUTHZ_013",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3079,7 +3079,7 @@
       "name": "Back Navigation After Logout Shows Login",
       "testId": "TC_AUTHZ_014",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3119,7 +3119,7 @@
       "name": "Category API Requires Auth Token",
       "testId": "TC_AUTHZ_016",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3139,7 +3139,7 @@
       "name": "Transaction Creation Requires Auth",
       "testId": "TC_AUTHZ_017",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3159,7 +3159,7 @@
       "name": "Budget API Requires Auth",
       "testId": "TC_AUTHZ_018",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3179,7 +3179,7 @@
       "name": "Savings Goals API Requires Auth",
       "testId": "TC_AUTHZ_019",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3199,7 +3199,7 @@
       "name": "Chatbot API Requires Auth",
       "testId": "TC_AUTHZ_020",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3399,7 +3399,7 @@
       "name": "Token Expiry Boundary - Just Expired",
       "testId": "TC_AUTHZ_030",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3419,7 +3419,7 @@
       "name": "Session Stored After Login",
       "testId": "TC_SESS_001",
       "locatorUsed": "",
-      "durationMs": 57,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3499,7 +3499,7 @@
       "name": "User Email Available in Session",
       "testId": "TC_SESS_005",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3539,7 +3539,7 @@
       "name": "Currency Available in Session",
       "testId": "TC_SESS_007",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3559,7 +3559,7 @@
       "name": "Access Token Used in API Requests",
       "testId": "TC_SESS_008",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3599,7 +3599,7 @@
       "name": "No Active Session Shows Login Screen",
       "testId": "TC_SESS_010",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3619,7 +3619,7 @@
       "name": "Google Auth Stores Tokens Correctly",
       "testId": "TC_SESS_011",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3659,7 +3659,7 @@
       "name": "Session Not Duplicated After Multiple Logins",
       "testId": "TC_SESS_013",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3679,7 +3679,7 @@
       "name": "Session Keys Are Correct Constants",
       "testId": "TC_SESS_014",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3719,7 +3719,7 @@
       "name": "Logout Navigates to Login Screen",
       "testId": "TC_SESS_016",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3739,7 +3739,7 @@
       "name": "Back Press After Logout Cannot Access Dashboard",
       "testId": "TC_SESS_017",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3759,7 +3759,7 @@
       "name": "Session Currency Reflects Profile Currency",
       "testId": "TC_SESS_018",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3819,7 +3819,7 @@
       "name": "Valid Registration with All Fields",
       "testId": "TC_REG_001",
       "locatorUsed": "",
-      "durationMs": 57,
+      "durationMs": 63,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3839,7 +3839,7 @@
       "name": "Registration with Password Mismatch",
       "testId": "TC_REG_002",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3859,7 +3859,7 @@
       "name": "Registration with Duplicate Email",
       "testId": "TC_REG_003",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3879,7 +3879,7 @@
       "name": "Registration with Empty Name",
       "testId": "TC_REG_004",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3899,7 +3899,7 @@
       "name": "Registration with Weak Password",
       "testId": "TC_REG_005",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3919,7 +3919,7 @@
       "name": "Registration with Invalid Email Format",
       "testId": "TC_REG_006",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3939,7 +3939,7 @@
       "name": "T&C Checkbox Required for Registration",
       "testId": "TC_REG_007",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3979,7 +3979,7 @@
       "name": "Confirm Password Toggle Verify",
       "testId": "TC_REG_009",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -3999,7 +3999,7 @@
       "name": "Sign In Link from Signup Screen",
       "testId": "TC_REG_010",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4039,7 +4039,7 @@
       "name": "Facebook Sign-In from Signup Screen",
       "testId": "TC_REG_012",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4079,7 +4079,7 @@
       "name": "Registration with Very Long Name",
       "testId": "TC_REG_014",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4099,7 +4099,7 @@
       "name": "Registration Fields Clear After Navigation Back",
       "testId": "TC_REG_015",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4119,7 +4119,7 @@
       "name": "Registration Error Cleared on Field Edit",
       "testId": "TC_REG_016",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 59,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4139,7 +4139,7 @@
       "name": "Registration Loader Shown During API Call",
       "testId": "TC_REG_017",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4159,7 +4159,7 @@
       "name": "Signup Subtitle Text Verified",
       "testId": "TC_REG_018",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4179,7 +4179,7 @@
       "name": "Keyboard Does Not Obscure CTA Button",
       "testId": "TC_REG_019",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4199,7 +4199,7 @@
       "name": "Screen Rotation on Signup Preserves Data",
       "testId": "TC_REG_020",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4219,7 +4219,7 @@
       "name": "Amount Field Rejects Alphabetic Input",
       "testId": "TC_VAL_001",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4239,7 +4239,7 @@
       "name": "Amount Cannot Be Zero",
       "testId": "TC_VAL_002",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4259,7 +4259,7 @@
       "name": "Amount Cannot Be Negative",
       "testId": "TC_VAL_003",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4279,7 +4279,7 @@
       "name": "Email Validates on Login Submit",
       "testId": "TC_VAL_004",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4299,7 +4299,7 @@
       "name": "Password Minimum Length Validation",
       "testId": "TC_VAL_005",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4319,7 +4319,7 @@
       "name": "Empty Name Field Validation on Setup",
       "testId": "TC_VAL_006",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4339,7 +4339,7 @@
       "name": "Budget Amount Field Accepts Only Numbers",
       "testId": "TC_VAL_007",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4359,7 +4359,7 @@
       "name": "Salary Field Accepts Only Decimal Numbers",
       "testId": "TC_VAL_008",
       "locatorUsed": "",
-      "durationMs": 58,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4379,7 +4379,7 @@
       "name": "Note Field Accepts Long Text",
       "testId": "TC_VAL_009",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4399,7 +4399,7 @@
       "name": "Category Required Before Save",
       "testId": "TC_VAL_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4439,7 +4439,7 @@
       "name": "Date Field Cannot Be Empty",
       "testId": "TC_VAL_012",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 57,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4459,7 +4459,7 @@
       "name": "Goal Name Cannot Be Empty",
       "testId": "TC_VAL_013",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 61,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4479,7 +4479,7 @@
       "name": "Goal Target Amount Cannot Be Zero",
       "testId": "TC_VAL_014",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4499,7 +4499,7 @@
       "name": "Subscription Name Cannot Be Empty",
       "testId": "TC_VAL_015",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4539,7 +4539,7 @@
       "name": "T&C Checkbox Required for Signup",
       "testId": "TC_VAL_017",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4559,7 +4559,7 @@
       "name": "Password and Confirm Must Match",
       "testId": "TC_VAL_018",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4579,7 +4579,7 @@
       "name": "Email Must Contain @ Symbol",
       "testId": "TC_VAL_019",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4639,7 +4639,7 @@
       "name": "Keypad Leading Zero Handling",
       "testId": "TC_VAL_022",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4659,7 +4659,7 @@
       "name": "Reset Password OTP Empty Validation",
       "testId": "TC_VAL_023",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4679,7 +4679,7 @@
       "name": "Reset Password New Password Validation",
       "testId": "TC_VAL_024",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4699,7 +4699,7 @@
       "name": "Forgot Password Empty Email Validation",
       "testId": "TC_VAL_025",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4719,7 +4719,7 @@
       "name": "Budget Category Amount Cannot Exceed Total",
       "testId": "TC_VAL_026",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4739,7 +4739,7 @@
       "name": "Date Cannot Be in Far Future",
       "testId": "TC_VAL_027",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4779,7 +4779,7 @@
       "name": "Search Field Accepts Long Input",
       "testId": "TC_VAL_029",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4799,7 +4799,7 @@
       "name": "Goal Current Amount Cannot Exceed Target",
       "testId": "TC_VAL_030",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4859,7 +4859,7 @@
       "name": "Pocket Money Amount Decimal Validation",
       "testId": "TC_VAL_033",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4919,7 +4919,7 @@
       "name": "Category Name Cannot Be Empty on Create",
       "testId": "TC_VAL_036",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4959,7 +4959,7 @@
       "name": "Monthly Income Validation on General Setup",
       "testId": "TC_VAL_038",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4979,7 +4979,7 @@
       "name": "Input Fields Trim Leading/Trailing Spaces",
       "testId": "TC_VAL_039",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -4999,7 +4999,7 @@
       "name": "Backspace Clears Amount Completely",
       "testId": "TC_VAL_040",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5019,7 +5019,7 @@
       "name": "Network Error Shows Appropriate Message",
       "testId": "TC_ERR_001",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5039,7 +5039,7 @@
       "name": "API 500 Error Handled Gracefully",
       "testId": "TC_ERR_002",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5059,7 +5059,7 @@
       "name": "API 404 Error Handled on Transaction Fetch",
       "testId": "TC_ERR_003",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5119,7 +5119,7 @@
       "name": "App Does Not Crash on Empty API Response",
       "testId": "TC_ERR_006",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5139,7 +5139,7 @@
       "name": "App Does Not Crash on Null Field in Response",
       "testId": "TC_ERR_007",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5159,7 +5159,7 @@
       "name": "Error Message is User-Friendly",
       "testId": "TC_ERR_008",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5179,7 +5179,7 @@
       "name": "Error Does Not Block Navigation",
       "testId": "TC_ERR_009",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5219,7 +5219,7 @@
       "name": "No ANR (App Not Responding) During Load",
       "testId": "TC_ERR_011",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 57,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5239,7 +5239,7 @@
       "name": "Budget Save Error Shown Correctly",
       "testId": "TC_ERR_012",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5359,7 +5359,7 @@
       "name": "Dashboard Stats Error Handled",
       "testId": "TC_ERR_018",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5379,7 +5379,7 @@
       "name": "Report Data Error Handled",
       "testId": "TC_ERR_019",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5599,7 +5599,7 @@
       "name": "Notification Message Matches Alert Message",
       "testId": "TC_NOTIF_010",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5659,7 +5659,7 @@
       "name": "Critical Alert Highlighted Differently",
       "testId": "TC_NOTIF_013",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5679,7 +5679,7 @@
       "name": "Notification Opens App on Tap",
       "testId": "TC_NOTIF_014",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5779,7 +5779,7 @@
       "name": "Notification prefs - Weekly Report Toggle",
       "testId": "TC_NOTIF_019",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5819,7 +5819,7 @@
       "name": "Login Screen Shows Network Error When Offline",
       "testId": "TC_OFFL_001",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 50,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5859,7 +5859,7 @@
       "name": "Add Transaction Shows Error When Offline",
       "testId": "TC_OFFL_003",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5939,7 +5939,7 @@
       "name": "APK Cleartext Traffic Allowed for Local Backend",
       "testId": "TC_OFFL_007",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5979,7 +5979,7 @@
       "name": "App Shows Proper Error for Airplane Mode",
       "testId": "TC_OFFL_009",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -5999,7 +5999,7 @@
       "name": "Session Data Available When Offline",
       "testId": "TC_OFFL_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6019,7 +6019,7 @@
       "name": "Full Login to Transaction E2E Flow",
       "testId": "TC_REG_SUITE_001",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6099,7 +6099,7 @@
       "name": "Savings Goal Full Flow Regression",
       "testId": "TC_REG_SUITE_005",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 50,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6139,7 +6139,7 @@
       "name": "Profile Update Regression",
       "testId": "TC_REG_SUITE_007",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6159,7 +6159,7 @@
       "name": "Reports Generation Regression",
       "testId": "TC_REG_SUITE_008",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6199,7 +6199,7 @@
       "name": "Navigation Regression - All Tabs",
       "testId": "TC_REG_SUITE_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6259,7 +6259,7 @@
       "name": "Logout and Re-Login Regression",
       "testId": "TC_REG_SUITE_013",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6339,7 +6339,7 @@
       "name": "Chatbot Conversation Regression",
       "testId": "TC_REG_SUITE_017",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6359,7 +6359,7 @@
       "name": "Budget Alerts Regression",
       "testId": "TC_REG_SUITE_018",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6439,7 +6439,7 @@
       "name": "Monthly Budget View Regression",
       "testId": "TC_REG_SUITE_022",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6499,7 +6499,7 @@
       "name": "Expense Details Screen Full Regression",
       "testId": "TC_REG_SUITE_025",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6519,7 +6519,7 @@
       "name": "Category Details Screen Regression",
       "testId": "TC_REG_SUITE_026",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6559,7 +6559,7 @@
       "name": "Spending Trends Regression",
       "testId": "TC_REG_SUITE_028",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6619,7 +6619,7 @@
       "name": "Overspending Warning Flow Regression",
       "testId": "TC_REG_SUITE_031",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6639,7 +6639,7 @@
       "name": "Profile Completion Screen Regression",
       "testId": "TC_REG_SUITE_032",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6699,7 +6699,7 @@
       "name": "Homemaker Dashboard Household Budget Regression",
       "testId": "TC_REG_SUITE_035",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6759,7 +6759,7 @@
       "name": "Budget API Month/Year Parameters Regression",
       "testId": "TC_REG_SUITE_038",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 50,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6799,7 +6799,7 @@
       "name": "App Theme Consistent Across All Screens",
       "testId": "TC_REG_SUITE_040",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6839,7 +6839,7 @@
       "name": "API Base URL Used Correctly",
       "testId": "TC_REG_SUITE_042",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6879,7 +6879,7 @@
       "name": "App Works on Android API 24 (minSdk)",
       "testId": "TC_REG_SUITE_044",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 50,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6939,7 +6939,7 @@
       "name": "usesCleartextTraffic Allows HTTP API Calls",
       "testId": "TC_REG_SUITE_047",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6959,7 +6959,7 @@
       "name": "View-based Legacy Activities Not Accessible",
       "testId": "TC_REG_SUITE_048",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -6999,7 +6999,7 @@
       "name": "Complete Automation Framework Generates All Reports",
       "testId": "TC_REG_SUITE_050",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7019,7 +7019,7 @@
       "name": "Student Role Setup with All Fields",
       "testId": "TC_PROF_001",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 57,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7039,7 +7039,7 @@
       "name": "Employee Role Setup with All Fields",
       "testId": "TC_PROF_002",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7059,7 +7059,7 @@
       "name": "Homemaker Role Setup",
       "testId": "TC_PROF_003",
       "locatorUsed": "",
-      "durationMs": 57,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7079,7 +7079,7 @@
       "name": "General Role Setup",
       "testId": "TC_PROF_004",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7139,7 +7139,7 @@
       "name": "Notification Preferences Toggle On",
       "testId": "TC_PROF_007",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7159,7 +7159,7 @@
       "name": "Notification Preferences Toggle Off",
       "testId": "TC_PROF_008",
       "locatorUsed": "",
-      "durationMs": 59,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7179,7 +7179,7 @@
       "name": "Currency Selection in Profile",
       "testId": "TC_PROF_009",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7199,7 +7199,7 @@
       "name": "Onboarding Completion Persisted",
       "testId": "TC_PROF_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7219,7 +7219,7 @@
       "name": "Budget Setup Empty Total Limit Validation",
       "testId": "TC_PROF_011",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7239,7 +7239,7 @@
       "name": "Role Selection with Freelancer",
       "testId": "TC_PROF_012",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7259,7 +7259,7 @@
       "name": "Profile Screen Displays User Email",
       "testId": "TC_PROF_013",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7279,7 +7279,7 @@
       "name": "Profile Screen Displays User Name",
       "testId": "TC_PROF_014",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7299,7 +7299,7 @@
       "name": "Role Selection Continue Disabled Without Selection",
       "testId": "TC_PROF_015",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7319,7 +7319,7 @@
       "name": "Profile Picture Placeholder Shown",
       "testId": "TC_PROF_016",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7339,7 +7339,7 @@
       "name": "Notification Permission Allow Flow",
       "testId": "TC_PROF_017",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7359,7 +7359,7 @@
       "name": "Notification Permission Not Now Flow",
       "testId": "TC_PROF_018",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7379,7 +7379,7 @@
       "name": "Progress Bar Shows 50% on Step 1 of 2",
       "testId": "TC_PROF_019",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7399,7 +7399,7 @@
       "name": "Progress Bar Shows 100% on Budget Setup",
       "testId": "TC_PROF_020",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7419,7 +7419,7 @@
       "name": "Add Expense Transaction - Food Category",
       "testId": "TC_FORM_001",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 60,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7439,7 +7439,7 @@
       "name": "Add Income Transaction",
       "testId": "TC_FORM_002",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7499,7 +7499,7 @@
       "name": "Keypad Decimal Entry",
       "testId": "TC_FORM_005",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7519,7 +7519,7 @@
       "name": "Keypad Backspace Removes Digit",
       "testId": "TC_FORM_006",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7559,7 +7559,7 @@
       "name": "Save Transaction Without Amount",
       "testId": "TC_FORM_008",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7579,7 +7579,7 @@
       "name": "Date Picker Opens on Date Field Tap",
       "testId": "TC_FORM_009",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7599,7 +7599,7 @@
       "name": "Date Selection Updates Display",
       "testId": "TC_FORM_010",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7619,7 +7619,7 @@
       "name": "Expense/Income Toggle Switches State",
       "testId": "TC_FORM_011",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7639,7 +7639,7 @@
       "name": "Category Selection - Transport",
       "testId": "TC_FORM_012",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7679,7 +7679,7 @@
       "name": "Category Selection - Health",
       "testId": "TC_FORM_014",
       "locatorUsed": "",
-      "durationMs": 55,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7699,7 +7699,7 @@
       "name": "Category Selection - Bills",
       "testId": "TC_FORM_015",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7739,7 +7739,7 @@
       "name": "Category Selection - Investment",
       "testId": "TC_FORM_017",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7759,7 +7759,7 @@
       "name": "Category Selection - Travel",
       "testId": "TC_FORM_018",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7779,7 +7779,7 @@
       "name": "Category Selection - Education",
       "testId": "TC_FORM_019",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7799,7 +7799,7 @@
       "name": "Category Selection - Rent EMI",
       "testId": "TC_FORM_020",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7839,7 +7839,7 @@
       "name": "Budget Setup Food Category Entry",
       "testId": "TC_FORM_022",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7879,7 +7879,7 @@
       "name": "Budget Setup Transport Category Entry",
       "testId": "TC_FORM_024",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7899,7 +7899,7 @@
       "name": "Budget Setup Entertainment Category Entry",
       "testId": "TC_FORM_025",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 58,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7919,7 +7919,7 @@
       "name": "Savings Goal Form - Name Entry",
       "testId": "TC_FORM_026",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7959,7 +7959,7 @@
       "name": "Savings Goal Form - Target Date Picker",
       "testId": "TC_FORM_028",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7979,7 +7979,7 @@
       "name": "Subscription Form - Name Entry",
       "testId": "TC_FORM_029",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -7999,7 +7999,7 @@
       "name": "Subscription Form - Amount Entry",
       "testId": "TC_FORM_030",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8039,7 +8039,7 @@
       "name": "Forgot Password Form - Email Entry",
       "testId": "TC_FORM_032",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8059,7 +8059,7 @@
       "name": "Forgot Password Form - Invalid Email",
       "testId": "TC_FORM_033",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8079,7 +8079,7 @@
       "name": "Student Setup Name Field Entry",
       "testId": "TC_FORM_034",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8099,7 +8099,7 @@
       "name": "Student Setup Pocket Money Amount",
       "testId": "TC_FORM_035",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8119,7 +8119,7 @@
       "name": "Employee Setup Salary Field",
       "testId": "TC_FORM_036",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8139,7 +8139,7 @@
       "name": "Employee Setup Company Name Field",
       "testId": "TC_FORM_037",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8159,7 +8159,7 @@
       "name": "Chatbot Message Input Field",
       "testId": "TC_FORM_038",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8179,7 +8179,7 @@
       "name": "Add Transaction - All 12 Categories Visible",
       "testId": "TC_FORM_039",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8199,7 +8199,7 @@
       "name": "Category Change After Initial Selection",
       "testId": "TC_FORM_040",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8219,7 +8219,7 @@
       "name": "Create Expense Transaction Successfully",
       "testId": "TC_CRUD_001",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8239,7 +8239,7 @@
       "name": "Create Income Transaction Successfully",
       "testId": "TC_CRUD_002",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8259,7 +8259,7 @@
       "name": "Read Transaction by ID",
       "testId": "TC_CRUD_003",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8279,7 +8279,7 @@
       "name": "Update Transaction Amount",
       "testId": "TC_CRUD_004",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 55,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8339,7 +8339,7 @@
       "name": "Delete Transaction from Details Screen",
       "testId": "TC_CRUD_007",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 54,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8359,7 +8359,7 @@
       "name": "Deleted Transaction Removed from List",
       "testId": "TC_CRUD_008",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8379,7 +8379,7 @@
       "name": "Create Transaction Updates Dashboard Balance",
       "testId": "TC_CRUD_009",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8439,7 +8439,7 @@
       "name": "Create Savings Goal",
       "testId": "TC_CRUD_012",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8519,7 +8519,7 @@
       "name": "Set Budget for Category",
       "testId": "TC_CRUD_016",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8579,7 +8579,7 @@
       "name": "Transaction with Tags Created",
       "testId": "TC_CRUD_019",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8599,7 +8599,7 @@
       "name": "Budget Warning Shown When Overspent",
       "testId": "TC_CRUD_020",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8619,7 +8619,7 @@
       "name": "Transaction Amount Decimal Precision",
       "testId": "TC_CRUD_021",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8639,7 +8639,7 @@
       "name": "Transaction List Sorted by Date Descending",
       "testId": "TC_CRUD_022",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8679,7 +8679,7 @@
       "name": "Concurrent Transaction Creation",
       "testId": "TC_CRUD_024",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8699,7 +8699,7 @@
       "name": "Transaction History Count Updates After Create",
       "testId": "TC_CRUD_025",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8719,7 +8719,7 @@
       "name": "Transaction History Count Updates After Delete",
       "testId": "TC_CRUD_026",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8739,7 +8739,7 @@
       "name": "Savings Goal Progress Percentage Correct",
       "testId": "TC_CRUD_027",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8759,7 +8759,7 @@
       "name": "Budget Remaining Amount Correct",
       "testId": "TC_CRUD_028",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8779,7 +8779,7 @@
       "name": "Create Transaction with Future Date",
       "testId": "TC_CRUD_029",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8839,7 +8839,7 @@
       "name": "Transaction Description Special Characters",
       "testId": "TC_CRUD_032",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -8859,7 +8859,7 @@
       "name": "Multiple Categories Selectable in Different Transactions",
       "testId": "TC_CRUD_033",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9079,7 +9079,7 @@
       "name": "Search by Transaction Type",
       "testId": "TC_SRCH_004",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9139,7 +9139,7 @@
       "name": "Clear Search Field Resets Results",
       "testId": "TC_SRCH_007",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9179,7 +9179,7 @@
       "name": "Search Performance for Large Dataset",
       "testId": "TC_SRCH_009",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9239,7 +9239,7 @@
       "name": "Search with Numeric Amount Keywords",
       "testId": "TC_SRCH_012",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9259,7 +9259,7 @@
       "name": "Search Input Auto-Focus on Screen Load",
       "testId": "TC_SRCH_013",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9279,7 +9279,7 @@
       "name": "Search History Persisted Between Sessions",
       "testId": "TC_SRCH_014",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9299,7 +9299,7 @@
       "name": "Offset Pagination in Search Results",
       "testId": "TC_SRCH_015",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9339,7 +9339,7 @@
       "name": "Category Filter Clears Correctly",
       "testId": "TC_SRCH_017",
       "locatorUsed": "",
-      "durationMs": 56,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9359,7 +9359,7 @@
       "name": "Type Filter Clears Correctly",
       "testId": "TC_SRCH_018",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9379,7 +9379,7 @@
       "name": "Search Returns Correct Count",
       "testId": "TC_SRCH_019",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9419,7 +9419,7 @@
       "name": "Filter by Category - Food",
       "testId": "TC_FILT_001",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9439,7 +9439,7 @@
       "name": "Filter by Category - Transport",
       "testId": "TC_FILT_002",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9459,7 +9459,7 @@
       "name": "Filter by Type - Expense Only",
       "testId": "TC_FILT_003",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9479,7 +9479,7 @@
       "name": "Filter by Type - Income Only",
       "testId": "TC_FILT_004",
       "locatorUsed": "",
-      "durationMs": 54,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9519,7 +9519,7 @@
       "name": "Multiple Filters Applied Simultaneously",
       "testId": "TC_FILT_006",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9559,7 +9559,7 @@
       "name": "Filter State Persists on Back Navigation",
       "testId": "TC_FILT_008",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9579,7 +9579,7 @@
       "name": "Filter by Tag",
       "testId": "TC_FILT_009",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9599,7 +9599,7 @@
       "name": "Filter Results Show Correct Count",
       "testId": "TC_FILT_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 50,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9619,7 +9619,7 @@
       "name": "Filter Screen Back Button Returns to List",
       "testId": "TC_FILT_011",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9679,7 +9679,7 @@
       "name": "Date Range Future End Date Validation",
       "testId": "TC_FILT_014",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9719,7 +9719,7 @@
       "name": "Empty Filter Returns All Transactions",
       "testId": "TC_FILT_016",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 50,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9779,7 +9779,7 @@
       "name": "Filter No Results Shows Empty State",
       "testId": "TC_FILT_019",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9899,7 +9899,7 @@
       "name": "Excel Report Generated After Suite",
       "testId": "TC_FILE_005",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9939,7 +9939,7 @@
       "name": "JSON Report Generated After Suite",
       "testId": "TC_FILE_007",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 56,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -9999,7 +9999,7 @@
       "name": "Failed Tests Excel Sheet Populated on Failure",
       "testId": "TC_FILE_010",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 50,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10039,7 +10039,7 @@
       "name": "Screenshot File Format is PNG",
       "testId": "TC_FILE_012",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10119,7 +10119,7 @@
       "name": "Artifacts Uploaded Even When Tests Fail",
       "testId": "TC_FILE_016",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10139,7 +10139,7 @@
       "name": "GitHub Pages Report URL Accessible",
       "testId": "TC_FILE_017",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10219,7 +10219,7 @@
       "name": "App Launch Time Under 3 Seconds (Cold Start)",
       "testId": "TC_PERF_001",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10259,7 +10259,7 @@
       "name": "Transaction List Loads in Under 3 Seconds",
       "testId": "TC_PERF_003",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 52,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10299,7 +10299,7 @@
       "name": "Smooth Scroll 60fps on Transaction List",
       "testId": "TC_PERF_005",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10319,7 +10319,7 @@
       "name": "Memory Usage Below 150MB During Normal Use",
       "testId": "TC_PERF_006",
       "locatorUsed": "",
-      "durationMs": 52,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10359,7 +10359,7 @@
       "name": "Search Response Under 2 Seconds",
       "testId": "TC_PERF_008",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10439,7 +10439,7 @@
       "name": "API Calls Have Reasonable Timeouts",
       "testId": "TC_PERF_012",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10499,7 +10499,7 @@
       "name": "App Startup Does Not Exceed 5 Seconds Warm Start",
       "testId": "TC_PERF_015",
       "locatorUsed": "",
-      "durationMs": 51,
+      "durationMs": 53,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10539,7 +10539,7 @@
       "name": "Chart Rendering Smooth on Reports Screen",
       "testId": "TC_PERF_017",
       "locatorUsed": "",
-      "durationMs": 50,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
@@ -10599,7 +10599,7 @@
       "name": "Network Calls Use Efficient Payload Size",
       "testId": "TC_PERF_020",
       "locatorUsed": "",
-      "durationMs": 53,
+      "durationMs": 51,
       "pageSourcePath": "",
       "actualResult": "Test passed",
       "status": "PASSED"
